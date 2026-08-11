@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Plus, Search, Upload } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
+import { getSuItem } from "@/lib/su-module";
 import { suSections } from "@/lib/su-submenus";
 import { formatCurrency } from "@/lib/utils";
 import { Droplets, FileText, Gauge, UserPlus } from "lucide-react";
@@ -93,14 +94,16 @@ export default function SuPage() {
           icon={FileText}
           iconColor="bg-blue-50 text-blue-600"
         />
-        <StatCard
-          label="Tahsil Edilen"
-          value={formatCurrency(624500)}
-          change="↑ 8.2% geçen aya göre"
-          changeType="positive"
-          icon={Droplets}
-          iconColor="bg-emerald-50 text-emerald-600"
-        />
+        <Link href="/tahsilat/raporlar/su">
+          <StatCard
+            label="Tahsil Edilen"
+            value={formatCurrency(624500)}
+            change="↑ 8.2% — tahsilat raporuna git"
+            changeType="positive"
+            icon={Droplets}
+            iconColor="bg-emerald-50 text-emerald-600"
+          />
+        </Link>
         <StatCard
           label="Okuma Bekleyen"
           value="12"
@@ -144,7 +147,11 @@ export default function SuPage() {
 
         {workflowGroups.map((group) => {
           const sections = suSections.filter((s) => group.sectionIds.includes(s.id));
-          if (sections.length === 0) return null;
+          const directItems = group.sectionIds
+            .map((id) => getSuItem(id))
+            .filter((item) => item && !item.hasSubMenu);
+
+          if (sections.length === 0 && directItems.length === 0) return null;
 
           return (
             <section key={group.id} className="card overflow-hidden">
@@ -169,6 +176,27 @@ export default function SuPage() {
                           <p className="text-xs text-slate-500">
                             {section.subMenus.length} işlem
                           </p>
+                        </div>
+                        <ArrowRight className="h-4 w-4 shrink-0 text-slate-300" />
+                      </Link>
+                    </li>
+                  );
+                })}
+                {directItems.map((item) => {
+                  if (!item) return null;
+                  const Icon = item.icon;
+                  return (
+                    <li key={item.id}>
+                      <Link
+                        href={item.href}
+                        className="flex items-center gap-4 px-5 py-4 transition hover:bg-slate-50"
+                      >
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-50 text-cyan-600">
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-slate-900">{item.label}</p>
+                          <p className="text-xs text-slate-500">{item.description}</p>
                         </div>
                         <ArrowRight className="h-4 w-4 shrink-0 text-slate-300" />
                       </Link>

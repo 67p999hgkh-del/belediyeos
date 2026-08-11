@@ -18,7 +18,7 @@ export interface SuModuleItem {
   description: string;
   href: string;
   icon: LucideIcon;
-  group: "abonelik" | "fatura" | "islem" | "altyapi" | "saha";
+  group: "abonelik" | "fatura" | "islem" | "finans" | "altyapi" | "saha";
   hasSubMenu?: boolean;
 }
 
@@ -92,8 +92,8 @@ export const suModuleItems: SuModuleItem[] = [
     description: "Gecikme cezası indirim işlemleri",
     href: "/su/ceza-indirimi",
     icon: Percent,
-    group: "islem",
-    hasSubMenu: true,
+    group: "finans",
+    hasSubMenu: false,
   },
   {
     id: "kanalizasyon",
@@ -122,5 +122,9 @@ export const suModuleGroups = [
   { id: "altyapi" as const, label: "Altyapı Hizmetleri" },
   { id: "saha" as const, label: "Saha Operasyonları" },
 ];
+
+export function getSuItem(id: string) {
+  return suModuleItems.find((m) => m.id === id);
+}
 
 export const suHubIcon = Droplets;

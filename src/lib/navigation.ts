@@ -64,8 +64,9 @@ export const navigation: NavGroup[] = [
           { id: "t-yeni", label: "Yeni Tahsilat", href: "/tahsilat/yeni", shortcut: "Ctrl+1" },
           { id: "t-islem", label: "İşlem Listesi", href: "/tahsilat/islemler", shortcut: "Ctrl+2" },
           { id: "t-makbuz", label: "Makbuz Arama", href: "/tahsilat/makbuz-ara" },
+          { id: "t-vezne", label: "Vezne Dökümü", href: "/tahsilat/raporlar/vezne" },
+          { id: "t-iptal", label: "Tahsilat İptali", href: "/tahsilat/iptal" },
           { id: "t-liste", label: "Tahsilat Listesi", href: "/tahsilat/liste" },
-          { id: "t-rapor", label: "Raporlar", href: "/tahsilat/raporlar/genel" },
         ],
       },
       {

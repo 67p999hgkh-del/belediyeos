@@ -97,14 +97,6 @@ export const suSections: SuSection[] = [
     ],
   },
   {
-    ...suModuleItems.find((m) => m.id === "ceza-indirimi")!,
-    subMenus: [
-      { id: "tanim", label: "Ceza İndirimi Tanımlama", description: "Yeni ceza indirimi uygula", href: "/su/ceza-indirimi/tanim", icon: Plus },
-      { id: "liste", label: "Ceza İndirimi Listesi", description: "Uygulanan indirimleri listele", href: "/su/ceza-indirimi/liste", icon: List },
-      { id: "sorgulama", label: "Ceza İndirimi Sorgulama", description: "Abone ceza indirimi sorgula", href: "/su/ceza-indirimi/sorgulama", icon: Search },
-    ],
-  },
-  {
     ...suModuleItems.find((m) => m.id === "kanalizasyon")!,
     subMenus: [
       { id: "tahakkuk", label: "Kanalizasyon Tahakkuk", description: "Kanalizasyon bedeli tahakkuk", href: "/su/kanalizasyon/tahakkuk", icon: Waves },
