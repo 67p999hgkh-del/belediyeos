@@ -11,15 +11,11 @@ import {
   type TahsilatSicil,
 } from "@/lib/tahsilat-mock";
 
-export type OdemeYontemi = "nakit" | "kart" | "havale";
-
-export interface TahsilatOzet {
-  seciliAdet: number;
-  anaPara: number;
-  ceza: number;
-  kdv: number;
-  genelToplam: number;
-}
+export const tahsildarlar = [
+  { id: "ayse", label: "Ayşe Yılmaz" },
+  { id: "mehmet", label: "Mehmet Kaya" },
+  { id: "fatma", label: "Fatma Öztürk" },
+];
 
 const defaultFiltre = {
   sicilTipi: "tumu",
@@ -31,28 +27,29 @@ const defaultFiltre = {
 };
 
 export function useTahsilatOperasyon() {
+  const [tahsildar, setTahsildar] = useState("ayse");
+  const [tarih, setTarih] = useState(() => new Date().toISOString().slice(0, 10));
+  const [sifre, setSifre] = useState("");
+  const [sifreOk, setSifreOk] = useState<boolean | null>(null);
+
+  const [hizliArama, setHizliArama] = useState("");
+  const [hizliAramaAcik, setHizliAramaAcik] = useState(false);
+
   const [aramaSekmesi, setAramaSekmesi] = useState<TahsilatAramaSekmesi>("su-isyeri");
-  const [globalQuery, setGlobalQuery] = useState("");
   const [aboneParca, setAboneParca] = useState(["", "", "", ""]);
   const [tekArama, setTekArama] = useState("");
   const [aramaDurumu, setAramaDurumu] = useState<TahsilatAramaDurumu>("idle");
+
   const [sicil, setSicil] = useState<TahsilatSicil | null>(null);
-  const [sicilKey, setSicilKey] = useState<string | null>(null);
   const [tumBorclar, setTumBorclar] = useState<TahsilatBorcRow[]>([]);
   const [secili, setSecili] = useState<Record<string, boolean>>({});
   const [odemeTutarlari, setOdemeTutarlari] = useState<Record<string, string>>({});
   const [filtre, setFiltre] = useState(defaultFiltre);
-  const [gelismisFiltre, setGelismisFiltre] = useState(false);
 
-  const [odemeDrawerAcik, setOdemeDrawerAcik] = useState(false);
-  const [successAcik, setSuccessAcik] = useState(false);
-  const [odemeYontemi, setOdemeYontemi] = useState<OdemeYontemi>("nakit");
-  const [alinanTutar, setAlinanTutar] = useState("");
-  const [posRef, setPosRef] = useState("");
-  const [havaleRef, setHavaleRef] = useState("");
+  const [cekNo, setCekNo] = useState("");
   const [aciklama, setAciklama] = useState("");
-  const [veznePin, setVeznePin] = useState("");
-  const [makbuzNo, setMakbuzNo] = useState("");
+  const [kayitDurumu, setKayitDurumu] = useState<"idle" | "loading" | "basarili" | "hata">("idle");
+  const [kayitMesaj, setKayitMesaj] = useState("");
 
   const sekmeAramaMetni =
     aramaSekmesi === "su-isyeri" ? aboneParca.join("") : tekArama.replace(/\D/g, "");
@@ -62,25 +59,11 @@ export function useTahsilatOperasyon() {
     [tumBorclar, filtre],
   );
 
-  const ozet = useMemo((): TahsilatOzet => {
-    let seciliAdet = 0;
-    let anaPara = 0;
-    let ceza = 0;
-    let kdv = 0;
-    let genelToplam = 0;
-
-    filtrelenmisBorclar.forEach((row) => {
-      if (!secili[row.id]) return;
-      seciliAdet += 1;
-      const odeme = parseOdemeTutari(odemeTutarlari[row.id] ?? "", row.toplam);
-      const oran = row.toplam > 0 ? odeme / row.toplam : 1;
-      anaPara += row.anaPara * oran;
-      ceza += row.ceza * oran;
-      kdv += row.kdv * oran;
-      genelToplam += odeme;
-    });
-
-    return { seciliAdet, anaPara, ceza, kdv, genelToplam };
+  const odemeTutari = useMemo(() => {
+    return filtrelenmisBorclar.reduce((sum, row) => {
+      if (!secili[row.id]) return sum;
+      return sum + parseOdemeTutari(odemeTutarlari[row.id] ?? "", row.toplam);
+    }, 0);
   }, [filtrelenmisBorclar, secili, odemeTutarlari]);
 
   const sifirlaSecim = useCallback(() => {
@@ -89,20 +72,20 @@ export function useTahsilatOperasyon() {
   }, []);
 
   const uygulaSonuc = useCallback(
-    (sonuc: NonNullable<ReturnType<typeof aramaSicil>> | null) => {
+    (sonuc: ReturnType<typeof aramaSicil>) => {
       if (!sonuc) {
         setSicil(null);
-        setSicilKey(null);
         setTumBorclar([]);
         sifirlaSecim();
         setAramaDurumu("bulunamadi");
         return;
       }
       setSicil(sonuc.sicil);
-      setSicilKey(sonuc.key);
       setTumBorclar(sonuc.borclar);
       sifirlaSecim();
-      setAramaDurumu(sonuc.borclar.length === 0 ? "bulundu" : "bulundu");
+      setAramaDurumu("bulundu");
+      setKayitDurumu("idle");
+      setKayitMesaj("");
     },
     [sifirlaSecim],
   );
@@ -110,15 +93,15 @@ export function useTahsilatOperasyon() {
   const calistirArama = useCallback(
     async (metin: string) => {
       const q = metin.trim();
-      if (q.length < 2 && normalizeDigits(q).length < 4) {
-        setAramaDurumu("idle");
-        return;
-      }
+      if (q.length < 2 && q.replace(/\D/g, "").length < 4) return;
       setAramaDurumu("loading");
-      await new Promise((r) => setTimeout(r, 350));
+      setKayitDurumu("idle");
+      await new Promise((r) => setTimeout(r, 300));
       try {
         uygulaSonuc(aramaSicil(q));
       } catch {
+        setSicil(null);
+        setTumBorclar([]);
         setAramaDurumu("hata");
       }
     },
@@ -129,9 +112,17 @@ export function useTahsilatOperasyon() {
     calistirArama(sekmeAramaMetni);
   }, [calistirArama, sekmeAramaMetni]);
 
-  const handleGlobalArama = useCallback(() => {
-    calistirArama(globalQuery);
-  }, [calistirArama, globalQuery]);
+  const handleHizliArama = useCallback(() => {
+    calistirArama(hizliArama);
+  }, [calistirArama, hizliArama]);
+
+  const handleSifreBlur = () => {
+    if (!sifre) {
+      setSifreOk(null);
+      return;
+    }
+    setSifreOk(sifre.length >= 4);
+  };
 
   const toggleSatir = (row: TahsilatBorcRow, checked: boolean) => {
     setSecili((prev) => ({ ...prev, [row.id]: checked }));
@@ -141,6 +132,7 @@ export function useTahsilatOperasyon() {
         [row.id]: row.toplam.toFixed(2).replace(".", ","),
       }));
     }
+    setKayitDurumu("idle");
   };
 
   const tumunuSec = (checked: boolean) => {
@@ -154,137 +146,101 @@ export function useTahsilatOperasyon() {
     setOdemeTutarlari(tutarlar);
   };
 
-  const filtreleriTemizle = () => {
-    setFiltre(defaultFiltre);
-    setGelismisFiltre(false);
-  };
-
-  const odemeyeGec = () => {
-    if (ozet.seciliAdet === 0) return;
-    setAlinanTutar(ozet.genelToplam.toFixed(2).replace(".", ","));
-    setOdemeDrawerAcik(true);
-  };
-
-  const tahsilatiTamamla = () => {
-    if (veznePin.length < 4) return;
-    if (odemeYontemi === "nakit") {
-      const alinan = parseOdemeTutari(alinanTutar, ozet.genelToplam);
-      if (alinan < ozet.genelToplam) return;
+  const handleKaydet = useCallback(async () => {
+    if (!sicil) {
+      setKayitDurumu("hata");
+      setKayitMesaj("Önce sicil sorgulaması yapın.");
+      return;
     }
-    setMakbuzNo(`MK-${Date.now().toString().slice(-6)}`);
-    setOdemeDrawerAcik(false);
-    setSuccessAcik(true);
-    setVeznePin("");
-  };
+    if (odemeTutari <= 0) {
+      setKayitDurumu("hata");
+      setKayitMesaj("Tahsilat için en az bir borç seçin.");
+      return;
+    }
+    if (sifreOk === false) {
+      setKayitDurumu("hata");
+      setKayitMesaj("Geçerli vezne şifresi girin.");
+      return;
+    }
+    setKayitDurumu("loading");
+    setKayitMesaj("Tahsilat kaydediliyor...");
+    await new Promise((r) => setTimeout(r, 500));
+    setKayitDurumu("basarili");
+    setKayitMesaj(`Tahsilat kaydedildi — Makbuz: MK-${Date.now().toString().slice(-6)}`);
+  }, [sicil, odemeTutari, sifreOk]);
 
-  const yeniTahsilat = () => {
-    setSuccessAcik(false);
-    setOdemeDrawerAcik(false);
-    setGlobalQuery("");
-    setAboneParca(["", "", "", ""]);
-    setTekArama("");
-    setSicil(null);
-    setSicilKey(null);
-    setTumBorclar([]);
+  const handleIptal = useCallback(() => {
     sifirlaSecim();
-    setFiltre(defaultFiltre);
-    setAramaDurumu("idle");
+    setCekNo("");
     setAciklama("");
-    setAlinanTutar("");
-    setPosRef("");
-    setHavaleRef("");
-    setOdemeYontemi("nakit");
-    setMakbuzNo("");
-  };
-
-  const paraUstu = useMemo(() => {
-    const alinan = parseOdemeTutari(alinanTutar, 0);
-    return Math.max(0, alinan - ozet.genelToplam);
-  }, [alinanTutar, ozet.genelToplam]);
+    setKayitDurumu("idle");
+    setKayitMesaj("");
+  }, [sifirlaSecim]);
 
   return {
+    tahsildar,
+    setTahsildar,
+    tarih,
+    setTarih,
+    sifre,
+    setSifre,
+    sifreOk,
+    handleSifreBlur,
+    hizliArama,
+    setHizliArama,
+    hizliAramaAcik,
+    setHizliAramaAcik,
     aramaSekmesi,
     setAramaSekmesi,
-    globalQuery,
-    setGlobalQuery,
     aboneParca,
     setAboneParca,
     tekArama,
     setTekArama,
     aramaDurumu,
     sicil,
-    sicilKey,
     tumBorclar,
     secili,
     odemeTutarlari,
     setOdemeTutarlari,
     filtre,
     setFiltre,
-    gelismisFiltre,
-    setGelismisFiltre,
     filtrelenmisBorclar,
-    ozet,
-    odemeDrawerAcik,
-    setOdemeDrawerAcik,
-    successAcik,
-    odemeYontemi,
-    setOdemeYontemi,
-    alinanTutar,
-    setAlinanTutar,
-    posRef,
-    setPosRef,
-    havaleRef,
-    setHavaleRef,
+    odemeTutari,
+    cekNo,
+    setCekNo,
     aciklama,
     setAciklama,
-    veznePin,
-    setVeznePin,
-    makbuzNo,
-    paraUstu,
+    kayitDurumu,
+    kayitMesaj,
     handleSekmeArama,
-    handleGlobalArama,
+    handleHizliArama,
     toggleSatir,
     tumunuSec,
-    filtreleriTemizle,
-    odemeyeGec,
-    tahsilatiTamamla,
-    yeniTahsilat,
+    handleKaydet,
+    handleIptal,
   };
-}
-
-function normalizeDigits(v: string) {
-  return v.replace(/\D/g, "");
 }
 
 export function useTahsilatKlavye(opts: {
   aramaSekmesi: TahsilatAramaSekmesi;
-  odemeDrawerAcik: boolean;
-  successAcik: boolean;
-  seciliAdet: number;
   onSekmeArama: () => void;
-  onGlobalArama: () => void;
-  onOdemeDrawerKapat: () => void;
-  onSuccessKapat: () => void;
-  onOdemeyeGec: () => void;
+  onKaydet: () => void;
+  onIptal: () => void;
+  onCikis: () => void;
 }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        if (opts.successAcik) return;
-        if (opts.odemeDrawerAcik) {
-          e.preventDefault();
-          opts.onOdemeDrawerKapat();
-        }
-        return;
+      if (e.key === "F12") {
+        e.preventDefault();
+        opts.onCikis();
       }
-      if (opts.odemeDrawerAcik || opts.successAcik) return;
-
-      if (e.key === "Enter" && (e.target as HTMLElement).tagName !== "TEXTAREA") {
-        const active = document.activeElement as HTMLElement | null;
-        if (active?.dataset?.globalSearch === "true") {
-          e.preventDefault();
-          opts.onGlobalArama();
-        }
+      if (e.key === "F5") {
+        e.preventDefault();
+        opts.onIptal();
+      }
+      if (e.key === "F8") {
+        e.preventDefault();
+        opts.onKaydet();
       }
       if (e.key === "F9") {
         e.preventDefault();
@@ -293,10 +249,6 @@ export function useTahsilatKlavye(opts: {
       if (e.key === "F10" && opts.aramaSekmesi === "su-isyeri") {
         e.preventDefault();
         opts.onSekmeArama();
-      }
-      if (e.key === "F8" && opts.seciliAdet > 0) {
-        e.preventDefault();
-        opts.onOdemeyeGec();
       }
     };
     window.addEventListener("keydown", onKey);
