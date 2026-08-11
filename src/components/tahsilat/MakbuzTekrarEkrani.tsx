@@ -21,11 +21,21 @@ import {
 } from "@/lib/tahsilat-makbuz-mock";
 import { cn, formatCurrency } from "@/lib/utils";
 
-function BilgiAlani({ label, value }: { label: string; value: string }) {
+function BilgiSatiri({
+  label,
+  value,
+  className,
+}: {
+  label: string;
+  value: string;
+  className?: string;
+}) {
   return (
-    <div className="min-w-0">
-      <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-400">{label}</dt>
-      <dd className="mt-0.5 text-sm font-medium text-slate-800">{value || "—"}</dd>
+    <div className={className}>
+      <label className="text-xs text-slate-500">{label}</label>
+      <div className="mt-0.5 min-h-9 rounded border border-slate-200 bg-slate-50/80 px-2.5 py-1.5 text-sm font-medium text-slate-800">
+        {value || "—"}
+      </div>
     </div>
   );
 }
@@ -78,15 +88,11 @@ export function MakbuzTekrarEkrani() {
     setAramaDurumu("idle");
     setYazdirDurumu("idle");
     setYazdirMesaj("");
-    makbuzInputRef.current?.focus();
+    requestAnimationFrame(() => makbuzInputRef.current?.focus());
   }, []);
 
   const handleYazdir = useCallback(async () => {
-    if (!kayit) {
-      setYazdirDurumu("hata");
-      setYazdirMesaj("Önce bir makbuz sorgulayın.");
-      return;
-    }
+    if (!kayit) return;
     setYazdirDurumu("loading");
     setYazdirMesaj("Makbuz hazırlanıyor...");
     await new Promise((r) => setTimeout(r, 600));
@@ -110,23 +116,23 @@ export function MakbuzTekrarEkrani() {
         handleTemizle();
         return;
       }
-      if (e.key === "F8") {
+      if (e.key === "F8" && kayit) {
         e.preventDefault();
         handleYazdir();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [router, handleTemizle, handleYazdir]);
+  }, [router, handleTemizle, handleYazdir, kayit]);
 
   return (
     <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-      {/* Makbuz No arama */}
-      <div className="border-b border-slate-200 px-4 py-3">
-        <label htmlFor="makbuz-no" className="mb-1.5 block text-sm font-medium text-slate-700">
+      {/* Makbuz No arama — kompakt */}
+      <div className="border-b border-slate-200 px-4 py-2.5">
+        <label htmlFor="makbuz-no" className="mb-1 block text-xs text-slate-500">
           Makbuz No
         </label>
-        <div className="flex max-w-xl overflow-hidden rounded-lg border border-slate-200 shadow-sm focus-within:border-[#1e40af] focus-within:ring-2 focus-within:ring-[#1e40af]/15">
+        <div className="flex max-w-[520px] overflow-hidden rounded-md border border-slate-200 focus-within:border-[#1e40af] focus-within:ring-2 focus-within:ring-[#1e40af]/15">
           <input
             ref={makbuzInputRef}
             id="makbuz-no"
@@ -135,19 +141,19 @@ export function MakbuzTekrarEkrani() {
             onChange={(e) => setMakbuzNo(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAra()}
             placeholder="Makbuz numarasını girin"
-            className="min-w-0 flex-1 border-0 px-3 py-2.5 text-sm outline-none"
+            className="min-w-0 flex-1 border-0 bg-white px-2.5 py-1.5 text-sm outline-none"
             autoComplete="off"
           />
           <button
             type="button"
             onClick={handleAra}
             disabled={aramaDurumu === "loading"}
-            className="inline-flex shrink-0 items-center gap-1.5 border-l border-slate-200 bg-[#1e40af] px-4 text-sm font-medium text-white transition hover:bg-[#1e3a8a] disabled:opacity-60"
+            className="inline-flex shrink-0 items-center gap-1 border-l border-slate-200 bg-[#1e40af] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#1e3a8a] disabled:opacity-60"
           >
             {aramaDurumu === "loading" ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
-              <Search className="h-4 w-4" />
+              <Search className="h-3.5 w-3.5" />
             )}
             Makbuz Ara
           </button>
@@ -156,7 +162,10 @@ export function MakbuzTekrarEkrani() {
 
       {/* Uyarı mesajları */}
       {aramaDurumu === "bulunamadi" && (
-        <div className="flex items-start gap-2 border-b border-amber-100 bg-amber-50 px-4 py-2.5 text-sm text-amber-800" role="alert">
+        <div
+          className="flex items-start gap-2 border-b border-amber-100 bg-amber-50 px-4 py-2 text-sm text-amber-800"
+          role="alert"
+        >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           <div>
             <p className="font-medium">Bu numaraya ait makbuz bulunamadı.</p>
@@ -167,40 +176,33 @@ export function MakbuzTekrarEkrani() {
         </div>
       )}
       {aramaDurumu === "hata" && (
-        <div className="border-b border-red-100 bg-red-50 px-4 py-2.5 text-sm text-red-700" role="alert">
+        <div className="border-b border-red-100 bg-red-50 px-4 py-2 text-sm text-red-700" role="alert">
           Sorgulama sırasında bir hata oluştu. Lütfen tekrar deneyin.
         </div>
       )}
-      {yazdirDurumu === "hata" && yazdirMesaj && (
-        <div className="border-b border-red-100 bg-red-50 px-4 py-2.5 text-sm text-red-700" role="alert">
-          {yazdirMesaj}
-        </div>
-      )}
       {yazdirDurumu === "loading" && (
-        <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-4 py-2.5 text-sm text-slate-600">
+        <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-4 py-2 text-sm text-slate-600">
           <Loader2 className="h-4 w-4 animate-spin text-[#1e40af]" />
           {yazdirMesaj}
         </div>
       )}
       {yazdirDurumu === "basarili" && (
-        <div className="flex items-center gap-2 border-b border-emerald-100 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-800">
+        <div className="flex items-center gap-2 border-b border-emerald-100 bg-emerald-50 px-4 py-2 text-sm text-emerald-800">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           {yazdirMesaj}
         </div>
       )}
 
-      {/* Makbuz bilgileri — eski sıra korunur */}
-      <div className="border-b border-slate-100 px-4 py-3">
-        <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <BilgiAlani label="Tarih" value={kayit?.tarih ?? ""} />
-          <BilgiAlani label="Müstahlik No" value={kayit?.mustahlikNo ?? ""} />
-          <BilgiAlani label="Adı Soyadı" value={kayit?.adSoyad ?? ""} />
-          <BilgiAlani label="Çek No" value={kayit?.cekNo ?? ""} />
-          <BilgiAlani label="Tahsildar" value={kayit?.tahsildar ?? ""} />
-          <div className="sm:col-span-2 lg:col-span-3">
-            <BilgiAlani label="Adresi" value={kayit?.adres ?? ""} />
-          </div>
-        </dl>
+      {/* Makbuz bilgileri — eski UBS sırası */}
+      <div className="space-y-2 border-b border-slate-100 px-4 py-2.5">
+        <BilgiSatiri label="Tarih" value={kayit?.tarih ?? ""} className="max-w-xs" />
+        <BilgiSatiri label="Müstahlik No" value={kayit?.mustahlikNo ?? ""} className="max-w-xs" />
+        <BilgiSatiri label="Adı Soyadı" value={kayit?.adSoyad ?? ""} />
+        <BilgiSatiri label="Adresi" value={kayit?.adres ?? ""} />
+        <div className="grid gap-2 sm:grid-cols-2">
+          <BilgiSatiri label="Çek No" value={kayit?.cekNo ?? ""} />
+          <BilgiSatiri label="Tahsildar" value={kayit?.tahsildar ?? ""} />
+        </div>
       </div>
 
       {/* Tahsilat detay tablosu */}
@@ -208,29 +210,35 @@ export function MakbuzTekrarEkrani() {
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-50 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
             <tr className="border-b border-slate-200">
-              <th className="px-4 py-2.5">Tahsilat Türü</th>
-              <th className="px-4 py-2.5">Cari Dönem</th>
-              <th className="px-4 py-2.5 text-right">Bakiye</th>
-              <th className="px-4 py-2.5 text-right">Gecikme Zammı</th>
-              <th className="px-4 py-2.5 text-right">KDV</th>
+              <th className="px-4 py-2">Tahsilat Türü</th>
+              <th className="px-4 py-2">Cari Dönem</th>
+              <th className="px-4 py-2 text-right">Bakiye</th>
+              <th className="px-4 py-2 text-right">Gecikme Zammı</th>
+              <th className="px-4 py-2 text-right">KDV</th>
             </tr>
           </thead>
           <tbody>
             {aramaDurumu === "loading" ? (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center">
+                <td colSpan={5} className="h-[140px] px-4 text-center align-middle">
                   <Loader2 className="mx-auto h-5 w-5 animate-spin text-slate-400" />
                 </td>
               </tr>
             ) : !kayit ? (
               <tr>
-                <td colSpan={5} className="px-4 py-10 text-center text-sm text-slate-400">
+                <td
+                  colSpan={5}
+                  className="h-[140px] px-4 text-center align-middle text-sm text-slate-400"
+                >
                   Makbuz numarası girerek tahsilat bilgilerini görüntüleyin.
                 </td>
               </tr>
             ) : kayit.satirlar.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-sm text-slate-500">
+                <td
+                  colSpan={5}
+                  className="h-[140px] px-4 text-center align-middle text-sm text-slate-500"
+                >
                   Makbuz detay satırı bulunmuyor.
                 </td>
               </tr>
@@ -238,17 +246,17 @@ export function MakbuzTekrarEkrani() {
               kayit.satirlar.map((satir) => (
                 <tr
                   key={satir.id}
-                  className="border-b border-slate-100 transition-colors hover:bg-slate-50/80"
+                  className="h-10 border-b border-slate-100 transition-colors hover:bg-slate-50/80"
                 >
-                  <td className="px-4 py-2.5 font-medium text-slate-800">{satir.tahsilatTuru}</td>
-                  <td className="px-4 py-2.5 tabular-nums text-slate-600">{satir.cariDonem}</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums text-slate-700">
+                  <td className="px-4 py-1.5 font-medium text-slate-800">{satir.tahsilatTuru}</td>
+                  <td className="px-4 py-1.5 tabular-nums text-slate-600">{satir.cariDonem}</td>
+                  <td className="px-4 py-1.5 text-right tabular-nums text-slate-700">
                     {formatCurrency(satir.bakiye)}
                   </td>
-                  <td className="px-4 py-2.5 text-right tabular-nums text-slate-700">
+                  <td className="px-4 py-1.5 text-right tabular-nums text-slate-700">
                     {formatCurrency(satir.gecikmeZammi)}
                   </td>
-                  <td className="px-4 py-2.5 text-right tabular-nums text-slate-700">
+                  <td className="px-4 py-1.5 text-right tabular-nums text-slate-700">
                     {formatCurrency(satir.kdv)}
                   </td>
                 </tr>
@@ -258,30 +266,24 @@ export function MakbuzTekrarEkrani() {
         </table>
       </div>
 
-      {/* Toplam + Açıklama */}
-      <div className="border-t border-slate-100 px-4 py-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0 flex-1">
-            <label className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
-              Açıklama
-            </label>
-            <p className="mt-1 min-h-[2rem] text-sm text-slate-700">
-              {kayit?.aciklama || "—"}
-            </p>
-          </div>
-          <div className="shrink-0 text-right sm:pl-6">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-              Toplam
-            </p>
-            <p
-              className={cn(
-                "text-2xl font-bold tabular-nums tracking-tight",
-                kayit ? "text-[#1e40af]" : "text-slate-300",
-              )}
-            >
-              {formatCurrency(toplam)}
-            </p>
-          </div>
+      {/* Toplam — tablo altı sağ, güçlü odak */}
+      <div className="border-t border-slate-200 px-4 py-2 text-right">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Toplam</p>
+        <p
+          className={cn(
+            "text-3xl font-bold tabular-nums tracking-tight",
+            kayit ? "text-slate-900" : "text-slate-300",
+          )}
+        >
+          {formatCurrency(toplam)}
+        </p>
+      </div>
+
+      {/* Açıklama — toplam altında */}
+      <div className="border-t border-slate-100 px-4 py-2.5">
+        <label className="text-xs text-slate-500">Açıklama</label>
+        <div className="mt-0.5 min-h-9 rounded border border-slate-200 bg-slate-50/80 px-2.5 py-1.5 text-sm text-slate-700">
+          {kayit?.aciklama || "—"}
         </div>
       </div>
 
