@@ -1,86 +1,47 @@
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { PlaceholderPage } from "@/components/ui/PlaceholderPage";
-import { getSuItem, suModuleItems } from "@/lib/su-module";
-import { getSuSection } from "@/lib/su-submenus";
+import { Suspense } from "react";
+import { Loader2 } from "lucide-react";
 import { notFound } from "next/navigation";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { SuWorkspaceContent } from "@/components/su/SuWorkspaceContent";
+import { getSuWorkspace, suWorkspaceIds, type SuWorkspaceId } from "@/lib/su-workspaces";
 
 interface SuSectionPageProps {
   params: Promise<{ section: string }>;
 }
 
+function WorkspaceFallback() {
+  return (
+    <div className="flex items-center justify-center rounded-lg border border-slate-200 bg-white py-16">
+      <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+    </div>
+  );
+}
+
 export default async function SuSectionPage({ params }: SuSectionPageProps) {
   const { section: sectionId } = await params;
-  const section = getSuSection(sectionId);
-  const directItem = getSuItem(sectionId);
+  const ws = getSuWorkspace(sectionId);
 
-  if (section) {
-    return (
-      <div className="space-y-6">
-        <PageHeader
-          title={section.label}
-          description={section.description}
-          breadcrumbs={[
-            { label: "Kontrol Paneli", href: "/" },
-            { label: "Su Hizmetleri", href: "/su" },
-            { label: section.label },
-          ]}
-        />
+  if (!ws) notFound();
 
-        <div className="card overflow-hidden">
-          <div className="border-b border-slate-100 px-5 py-3">
-            <p className="text-sm font-medium text-slate-700">
-              {section.subMenus.length} işlem mevcut
-            </p>
-          </div>
-          <ul className="divide-y divide-slate-100">
-            {section.subMenus.map((item) => {
-              const Icon = item.icon;
-              return (
-                <li key={item.id}>
-                  <Link
-                    href={item.href}
-                    className="flex items-center gap-4 px-5 py-4 transition hover:bg-slate-50"
-                  >
-                    <Icon className="h-4 w-4 shrink-0 text-slate-400" />
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium text-slate-900">{item.label}</p>
-                      <p className="text-sm text-slate-500">{item.description}</p>
-                    </div>
-                    <span className="text-slate-300">→</span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-
-        <Link href="/su" className="btn-ghost inline-flex">
-          <ArrowLeft className="h-4 w-4" />
-          Su Hizmetleri&apos;ne dön
-        </Link>
-      </div>
-    );
-  }
-
-  if (directItem && !directItem.hasSubMenu) {
-    return (
-      <PlaceholderPage
-        title={directItem.label}
-        description={directItem.description}
+  return (
+    <div className="space-y-4">
+      <PageHeader
+        title={ws.title}
+        description={ws.description}
         breadcrumbs={[
           { label: "Kontrol Paneli", href: "/" },
           { label: "Su Hizmetleri", href: "/su" },
-          { label: directItem.label },
+          { label: ws.title },
         ]}
       />
-    );
-  }
 
-  notFound();
+      <Suspense fallback={<WorkspaceFallback />}>
+        <SuWorkspaceContent workspaceId={sectionId as SuWorkspaceId} />
+      </Suspense>
+    </div>
+  );
 }
 
 export function generateStaticParams() {
-  return suModuleItems.map((s) => ({ section: s.id }));
+  return suWorkspaceIds.map((section) => ({ section }));
 }

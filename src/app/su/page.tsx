@@ -9,10 +9,10 @@ import { Droplets, FileText, Gauge, UserPlus } from "lucide-react";
 
 /** Günlük en sık kullanılan işlemler — tek tıkla erişim */
 const dailyActions = [
-  { label: "Abone Sorgula", href: "/su/abone/sorgulama", icon: Search },
-  { label: "Fatura Kes", href: "/su/fatura/kesme", icon: FileText },
-  { label: "Okuma Aktar", href: "/su/el-terminali/aktarim", icon: Upload },
-  { label: "Yeni Abone", href: "/su/abone/kayit", icon: Plus },
+  { label: "Abone Sorgula", href: "/su/abone?tab=sorgulama", icon: Search },
+  { label: "Fatura Kes", href: "/su/fatura?tab=faturalandirma", icon: FileText },
+  { label: "Okuma Aktar", href: "/su/el-terminali?tab=veri-al", icon: Upload },
+  { label: "Yeni Abone", href: "/su/abone?tab=kayit", icon: Plus },
 ];
 
 /**
@@ -69,7 +69,7 @@ export default function SuPage() {
           { label: "Su Hizmetleri" },
         ]}
         action={
-          <Link href="/su/abone/kayit" className="btn-primary">
+          <Link href="/su/abone?tab=kayit" className="btn-primary">
             <Plus className="h-4 w-4" />
             Yeni Abone
           </Link>
