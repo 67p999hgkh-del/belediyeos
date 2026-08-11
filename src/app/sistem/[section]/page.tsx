@@ -74,16 +74,24 @@ export default async function SistemSectionPage({ params }: SistemSectionPagePro
 
   if (directItem && !directItem.hasSubMenu) {
     return (
-      <PlaceholderPage
-        title={directItem.label}
-        description={directItem.description}
-        breadcrumbs={[
-          { label: "Kontrol Paneli", href: "/" },
-          { label: "Sistem Yönetimi", href: "/sistem" },
-          ...(parentGroup ? [{ label: parentGroup.label, href: parentGroup.href }] : []),
-          { label: directItem.label },
-        ]}
-      />
+      <>
+        {directItem.disabled && (
+          <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 px-5 py-3 text-sm text-slate-600">
+            Bu işlem BirNet&apos;te pasif (gri) görünüyor — lisans veya modül durumuna bağlı
+            olabilir.
+          </div>
+        )}
+        <PlaceholderPage
+          title={directItem.label}
+          description={directItem.description}
+          breadcrumbs={[
+            { label: "Kontrol Paneli", href: "/" },
+            { label: "Sistem Yönetimi", href: "/sistem" },
+            ...(parentGroup ? [{ label: parentGroup.label, href: parentGroup.href }] : []),
+            { label: directItem.label },
+          ]}
+        />
+      </>
     );
   }
 

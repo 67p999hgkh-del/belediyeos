@@ -226,6 +226,7 @@ export const navigation: NavGroup[] = [
           { id: "sy-vezne", label: "Vezne Seçimi", href: "/sistem/vezne-secim" },
           { id: "sy-sifre", label: "Şifre Değiştirme", href: "/sistem/sifre-degistir" },
           { id: "sy-parametre", label: "Parametre Tanımları", href: "/sistem/parametre-tanim" },
+          { id: "sy-lisans", label: "Lisans Bilgileri", href: "/sistem/lisans-bilgileri" },
           { id: "sy-kod", label: "Genel Kod Girişi", href: "/sistem/genel-kod" },
           { id: "sy-sicil", label: "Sicil Birleştirme", href: "/sistem/sicil-birlestir" },
         ],

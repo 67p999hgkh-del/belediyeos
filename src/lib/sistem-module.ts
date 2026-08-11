@@ -8,6 +8,8 @@ import {
   Map,
   Merge,
   Printer,
+  RotateCcw,
+  ScrollText,
   Settings,
   Shield,
   Users,
@@ -21,7 +23,8 @@ export type SistemGroupId =
   | "kodlar"
   | "genel"
   | "modul"
-  | "sicil";
+  | "sicil"
+  | "platform";
 
 export type SistemFrequency = "daily" | "periodic" | "admin";
 
@@ -34,8 +37,11 @@ export interface SistemModuleItem {
   group: SistemGroupId;
   frequency: SistemFrequency;
   hasSubMenu?: boolean;
+  disabled?: boolean;
+  shortcut?: string;
 }
 
+/** BirNet SİSTEM menü sırası — üst + devam bölümü birleşik */
 export const sistemModuleItems: SistemModuleItem[] = [
   {
     id: "kullanici-ayarlari",
@@ -84,33 +90,6 @@ export const sistemModuleItems: SistemModuleItem[] = [
     frequency: "admin",
   },
   {
-    id: "vezne-secim",
-    label: "Vezne Seçimi",
-    description: "Aktif vezne seçimi",
-    href: "/sistem/vezne-secim",
-    icon: Wallet,
-    group: "vezne",
-    frequency: "daily",
-  },
-  {
-    id: "vezne-duzeltme",
-    label: "Vezne Düzeltme",
-    description: "Vezne kayıt düzeltme işlemleri",
-    href: "/sistem/vezne-duzeltme",
-    icon: Wrench,
-    group: "vezne",
-    frequency: "admin",
-  },
-  {
-    id: "kayip-fis",
-    label: "Kayıp Ödeme Fişi",
-    description: "Kayıp ödeme fişi işlemleri",
-    href: "/sistem/kayip-fis",
-    icon: Shield,
-    group: "vezne",
-    frequency: "admin",
-  },
-  {
     id: "genel-kod",
     label: "Genel Kod Girişi",
     description: "Sistem genel kod tanımları",
@@ -135,6 +114,42 @@ export const sistemModuleItems: SistemModuleItem[] = [
     href: "/sistem/meslek-kod",
     icon: Building2,
     group: "kodlar",
+    frequency: "admin",
+  },
+  {
+    id: "yazici-secim",
+    label: "Yazıcı Seçimi",
+    description: "Varsayılan yazıcı ayarı",
+    href: "/sistem/yazici-secim",
+    icon: Printer,
+    group: "kodlar",
+    frequency: "daily",
+  },
+  {
+    id: "vezne-secim",
+    label: "Vezne Seçimi",
+    description: "Aktif vezne seçimi",
+    href: "/sistem/vezne-secim",
+    icon: Wallet,
+    group: "vezne",
+    frequency: "daily",
+  },
+  {
+    id: "sicil-birlestir",
+    label: "Sicil Birleştirme",
+    description: "Mükerrer sicil birleştirme işlemi",
+    href: "/sistem/sicil-birlestir",
+    icon: Merge,
+    group: "sicil",
+    frequency: "admin",
+  },
+  {
+    id: "sicil-birlestir-rapor",
+    label: "Sicil Birleştirme Raporu",
+    description: "Sicil birleştirme işlem raporu",
+    href: "/sistem/sicil-birlestir-rapor",
+    icon: Merge,
+    group: "sicil",
     frequency: "admin",
   },
   {
@@ -166,13 +181,22 @@ export const sistemModuleItems: SistemModuleItem[] = [
     frequency: "admin",
   },
   {
-    id: "yazici-secim",
-    label: "Yazıcı Seçimi",
-    description: "Varsayılan yazıcı ayarı",
-    href: "/sistem/yazici-secim",
-    icon: Printer,
-    group: "genel",
-    frequency: "daily",
+    id: "vezne-duzeltme",
+    label: "Vezne Düzeltme",
+    description: "Vezne kayıt düzeltme işlemleri",
+    href: "/sistem/vezne-duzeltme",
+    icon: Wrench,
+    group: "vezne",
+    frequency: "admin",
+  },
+  {
+    id: "kayip-fis",
+    label: "Kayıp Ödeme Fişi",
+    description: "Kayıp ödeme fişi işlemleri",
+    href: "/sistem/kayip-fis",
+    icon: Shield,
+    group: "vezne",
+    frequency: "admin",
   },
   {
     id: "su-parametre",
@@ -211,22 +235,33 @@ export const sistemModuleItems: SistemModuleItem[] = [
     frequency: "admin",
   },
   {
-    id: "sicil-birlestir",
-    label: "Sicil Birleştirme",
-    description: "Mükerrer sicil birleştirme işlemi",
-    href: "/sistem/sicil-birlestir",
-    icon: Merge,
-    group: "sicil",
+    id: "personel-parametre",
+    label: "Personel Parametre",
+    description: "Personel modülü parametre ayarları (BirNet'te pasif)",
+    href: "/sistem/personel-parametre",
+    icon: Users,
+    group: "modul",
+    frequency: "admin",
+    disabled: true,
+  },
+  {
+    id: "lisans-bilgileri",
+    label: "Lisans Bilgileri",
+    description: "Yazılım lisans ve sürüm bilgileri",
+    href: "/sistem/lisans-bilgileri",
+    icon: ScrollText,
+    group: "platform",
     frequency: "admin",
   },
   {
-    id: "sicil-birlestir-rapor",
-    label: "Sicil Birleştirme Raporu",
-    description: "Sicil birleştirme işlem raporu",
-    href: "/sistem/sicil-birlestir-rapor",
-    icon: Merge,
-    group: "sicil",
+    id: "reset-menu",
+    label: "Reset Menü",
+    description: "Menü yerleşimini varsayılana sıfırla",
+    href: "/sistem/reset-menu",
+    icon: RotateCcw,
+    group: "platform",
     frequency: "admin",
+    shortcut: "Ctrl+Alt+R",
   },
 ];
 

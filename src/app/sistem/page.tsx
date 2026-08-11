@@ -38,8 +38,8 @@ export default function SistemPage() {
         />
         <StatCard
           label="Modül Parametre"
-          value="4"
-          change="Su · Emlak · İşyeri · İmar"
+          value="5"
+          change="Su · Emlak · İşyeri · İmar · Personel"
           changeType="neutral"
           icon={Globe}
           iconColor="bg-emerald-50 text-emerald-600"
@@ -81,8 +81,8 @@ export default function SistemPage() {
         <div className="mb-4">
           <h2 className="text-sm font-semibold text-slate-900">İş Alanları</h2>
           <p className="mt-1 text-sm text-slate-500">
-            {sistemTotalItemCount} işlem, 6 grupta — Kullanıcı → Vezne → Kod → Parametre →
-            Modül → Sicil sırasıyla ilerleyin.
+            {sistemTotalItemCount} işlem, 7 grupta — BirNet SİSTEM menüsüyle bire bir
+            eşleştirilmiştir.
           </p>
         </div>
 

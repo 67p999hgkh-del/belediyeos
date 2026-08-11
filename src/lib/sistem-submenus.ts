@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Globe, List, Plus, Search, Settings } from "lucide-react";
+import { Globe, List, Plus, RotateCcw, Search, Settings } from "lucide-react";
 import {
   getSistemItem,
   sistemModuleItems,
@@ -81,23 +81,29 @@ export const sistemWorkflowGroups: SistemWorkflowGroup[] = [
     description: "Genel kod, bölge ve meslek kodları",
     href: `${base}/grup/kodlar`,
     icon: getSistemItem("genel-kod")!.icon,
-    itemIds: ["genel-kod", "bolge-kod", "meslek-kod"],
+    itemIds: ["genel-kod", "bolge-kod", "meslek-kod", "yazici-secim"],
   },
   {
     id: "genel",
     label: "Genel Ayarlar",
-    description: "Parametre, döviz, tatil ve yazıcı",
+    description: "Parametre, döviz ve tatil günleri",
     href: `${base}/grup/genel`,
     icon: getSistemItem("parametre-tanim")!.icon,
-    itemIds: ["parametre-tanim", "doviz-kur", "tatil-gunleri", "yazici-secim"],
+    itemIds: ["parametre-tanim", "doviz-kur", "tatil-gunleri"],
   },
   {
     id: "modul",
     label: "Modül Parametreleri",
-    description: "Su, emlak, işyeri ve imar modül ayarları",
+    description: "Su, emlak, işyeri, imar ve personel modül ayarları",
     href: `${base}/grup/modul`,
     icon: getSistemItem("su-parametre")!.icon,
-    itemIds: ["su-parametre", "emlak-parametre", "isyeri-parametre", "imar-parametre"],
+    itemIds: [
+      "su-parametre",
+      "emlak-parametre",
+      "isyeri-parametre",
+      "imar-parametre",
+      "personel-parametre",
+    ],
   },
   {
     id: "sicil",
@@ -106,6 +112,14 @@ export const sistemWorkflowGroups: SistemWorkflowGroup[] = [
     href: `${base}/grup/sicil`,
     icon: getSistemItem("sicil-birlestir")!.icon,
     itemIds: ["sicil-birlestir", "sicil-birlestir-rapor"],
+  },
+  {
+    id: "platform",
+    label: "Lisans & Sistem",
+    description: "Lisans bilgileri ve menü sıfırlama",
+    href: `${base}/grup/platform`,
+    icon: RotateCcw,
+    itemIds: ["lisans-bilgileri", "reset-menu"],
   },
 ];
 

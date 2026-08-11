@@ -48,30 +48,65 @@ export default async function SistemGroupPage({ params }: SistemGroupPageProps) 
             const subCount = section?.subMenus.length;
             const freq = sistemFrequencyLabels[item.frequency];
 
-            return (
-              <li key={item.id}>
-                <Link
-                  href={item.href}
-                  className="flex items-center gap-4 px-5 py-4 transition hover:bg-slate-50"
+            const content = (
+              <>
+                <div
+                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+                    item.disabled
+                      ? "bg-slate-100 text-slate-400"
+                      : "bg-violet-50 text-violet-600"
+                  }`}
                 >
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
-                    <Icon className="h-4 w-4" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-medium text-slate-900">{item.label}</p>
+                  <Icon className="h-4 w-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p
+                      className={`font-medium ${item.disabled ? "text-slate-400" : "text-slate-900"}`}
+                    >
+                      {item.label}
+                    </p>
+                    {item.disabled ? (
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                        Pasif
+                      </span>
+                    ) : (
                       <span
                         className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${freq.className}`}
                       >
                         {freq.label}
                       </span>
-                    </div>
-                    <p className="mt-0.5 text-xs text-slate-500">
-                      {subCount ? `${subCount} alt işlem` : item.description}
-                    </p>
+                    )}
+                    {item.shortcut && (
+                      <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] text-slate-500">
+                        {item.shortcut}
+                      </span>
+                    )}
                   </div>
+                  <p className="mt-0.5 text-xs text-slate-500">
+                    {subCount ? `${subCount} alt işlem` : item.description}
+                  </p>
+                </div>
+                {!item.disabled && (
                   <ArrowRight className="h-4 w-4 shrink-0 text-slate-300" />
-                </Link>
+                )}
+              </>
+            );
+
+            return (
+              <li key={item.id}>
+                {item.disabled ? (
+                  <div className="flex cursor-not-allowed items-center gap-4 px-5 py-4 opacity-60">
+                    {content}
+                  </div>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className="flex items-center gap-4 px-5 py-4 transition hover:bg-slate-50"
+                  >
+                    {content}
+                  </Link>
+                )}
               </li>
             );
           })}
