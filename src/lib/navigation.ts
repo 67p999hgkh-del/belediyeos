@@ -92,9 +92,11 @@ export const navigation: NavGroup[] = [
         href: "/emlak",
         icon: Home,
         children: [
-          { id: "e-sicil", label: "Sicil Kayıt", href: "/emlak/sicil" },
-          { id: "e-tahakkuk", label: "Tahakkuk", href: "/emlak/tahakkuk" },
-          { id: "e-rapor", label: "Raporlar", href: "/emlak/raporlar" },
+          { id: "e-beyan", label: "Beyan Listesi", href: "/emlak/beyan-liste" },
+          { id: "e-tahakkuk", label: "Tahakkuk Hesaplama", href: "/emlak/tahakkuk-hesap" },
+          { id: "e-borc", label: "Borç Listesi", href: "/emlak/borc-liste" },
+          { id: "e-bildirim", label: "Bildirim Girişi", href: "/emlak/bildirim-giris" },
+          { id: "e-duzeltme", label: "Düzeltme", href: "/emlak/duzeltme" },
         ],
       },
       {
