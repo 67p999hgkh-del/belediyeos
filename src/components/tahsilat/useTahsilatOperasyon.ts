@@ -260,6 +260,7 @@ export function useTahsilatKlavye(opts: {
   aramaSekmesi: TahsilatAramaSekmesi;
   odemeDrawerAcik: boolean;
   successAcik: boolean;
+  seciliAdet: number;
   onSekmeArama: () => void;
   onGlobalArama: () => void;
   onOdemeDrawerKapat: () => void;
@@ -293,7 +294,7 @@ export function useTahsilatKlavye(opts: {
         e.preventDefault();
         opts.onSekmeArama();
       }
-      if (e.key === "F8") {
+      if (e.key === "F8" && opts.seciliAdet > 0) {
         e.preventDefault();
         opts.onOdemeyeGec();
       }
