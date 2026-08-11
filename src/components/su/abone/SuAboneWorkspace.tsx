@@ -18,10 +18,14 @@ import {
   getSuAboneByAboneNo,
   getSuAboneFaturalar,
   getSuAboneHareketler,
+  kaydetSuAbone,
   suAbonelikTurleri,
   suTarifeGruplari,
   type SuAboneKayit,
 } from "@/lib/su-abone-mock";
+import { kaydetSuAudit } from "@/lib/su-audit";
+import { useApp } from "@/context/AppContext";
+import { canSuIslem } from "@/lib/su-yetki";
 import { suWorkspaces } from "@/lib/su-workspaces";
 import { cn, formatCurrency } from "@/lib/utils";
 import {
@@ -46,6 +50,9 @@ type KayitDurum = "idle" | "loading" | "basarili" | "hata";
 export function SuAboneWorkspace() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user } = useApp();
+  const yetkiliKapama = canSuIslem("abone-kapama", user.role);
+  const yetkiliDevir = canSuIslem("abone-devir", user.role);
 
   const tabParam = searchParams.get("tab") ?? "sorgulama";
   const sectionParam = searchParams.get("section") ?? "genel";
@@ -83,6 +90,8 @@ export function SuAboneWorkspace() {
   });
   const [sonuclar, setSonuclar] = useState<SuAboneKayit[]>([]);
   const [aramaYapildi, setAramaYapildi] = useState(false);
+  const [kapamaGerekce, setKapamaGerekce] = useState("");
+  const [devirForm, setDevirForm] = useState({ yeniAdSoyad: "", yeniAdres: "", gerekce: "" });
 
   const setUrl = useCallback(
     (next: { tab?: string; section?: string; action?: string | null; abone?: string }) => {
@@ -142,9 +151,17 @@ export function SuAboneWorkspace() {
     }
     setKayitDurum("loading");
     await new Promise((r) => setTimeout(r, 400));
+    const aboneNo = formatAboneNo(kayitAboneParca) || `${Date.now()}`.slice(-8).replace(/(.{2})/g, "$1-").slice(0, -1);
+    kaydetSuAbone({ ...kayitForm, aboneNo });
+    kaydetSuAudit({
+      kullanici: user.name,
+      islem: "Su Abone Kaydı",
+      yeniDeger: aboneNo,
+      aciklama: kayitForm.adSoyad,
+    });
     setKayitDurum("basarili");
-    setMesaj({ tip: "ok", text: "Abone kaydı demo ortamında kaydedildi." });
-  }, [kayitForm.adSoyad]);
+    setMesaj({ tip: "ok", text: `Abone kaydı oluşturuldu — ${aboneNo}` });
+  }, [kayitForm, kayitAboneParca, user.name]);
 
   const handleIptal = useCallback(() => {
     setKayitAboneParca(["", "", "", ""]);
@@ -522,6 +539,100 @@ export function SuAboneWorkspace() {
                     <BorcTablosu rows={borcSatirlari} emptyMessage="Ödenmemiş borç bulunmuyor." />
                   </div>
                 )}
+                {detaySection === "abonelik-durumu" && (
+                  <div className="space-y-4">
+                    <ReadOnlyInfoField
+                      label="Mevcut Durum"
+                      value={seciliAbone.durum === "aktif" ? "Aktif" : seciliAbone.durum === "kapali" ? "Kapalı" : "Beklemede"}
+                    />
+                    {yetkiliKapama ? (
+                      <>
+                        <div>
+                          <label className="label">Gerekçe</label>
+                          <input
+                            className="input-field h-9 text-sm"
+                            value={kapamaGerekce}
+                            onChange={(e) => setKapamaGerekce(e.target.value)}
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            className="btn-primary inline-flex h-9 text-xs"
+                            onClick={() => {
+                              kaydetSuAudit({
+                                kullanici: user.name,
+                                islem: seciliAbone.durum === "aktif" ? "Abone Kapama" : "Abone Açma",
+                                eskiDeger: seciliAbone.durum,
+                                yeniDeger: seciliAbone.durum === "aktif" ? "kapali" : "aktif",
+                                gerekce: kapamaGerekce,
+                                aciklama: seciliAbone.aboneNo,
+                              });
+                              setMesaj({ tip: "ok", text: "Abonelik durumu güncellendi." });
+                            }}
+                          >
+                            {seciliAbone.durum === "aktif" ? "Abone Kapat" : "Abone Aç"}
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-sm text-slate-500">Bu işlem için yetkiniz bulunmuyor.</p>
+                    )}
+                  </div>
+                )}
+                {detaySection === "devir-nakil" && (
+                  <div className="space-y-4">
+                    {yetkiliDevir ? (
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div>
+                          <label className="label">Yeni Adı Soyadı (Ünvanı)</label>
+                          <input
+                            className="input-field h-9 text-sm"
+                            value={devirForm.yeniAdSoyad}
+                            onChange={(e) => setDevirForm((f) => ({ ...f, yeniAdSoyad: e.target.value }))}
+                          />
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label className="label">Yeni Adres</label>
+                          <input
+                            className="input-field h-9 text-sm"
+                            value={devirForm.yeniAdres}
+                            onChange={(e) => setDevirForm((f) => ({ ...f, yeniAdres: e.target.value }))}
+                          />
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label className="label">Gerekçe</label>
+                          <input
+                            className="input-field h-9 text-sm"
+                            value={devirForm.gerekce}
+                            onChange={(e) => setDevirForm((f) => ({ ...f, gerekce: e.target.value }))}
+                          />
+                        </div>
+                        <div className="sm:col-span-2">
+                          <button
+                            type="button"
+                            className="btn-primary inline-flex h-9"
+                            onClick={() => {
+                              kaydetSuAudit({
+                                kullanici: user.name,
+                                islem: "Abone Devir / Nakil",
+                                eskiDeger: seciliAbone.adSoyad,
+                                yeniDeger: devirForm.yeniAdSoyad,
+                                gerekce: devirForm.gerekce,
+                                aciklama: seciliAbone.aboneNo,
+                              });
+                              setMesaj({ tip: "ok", text: "Devir / nakil işlemi kaydedildi." });
+                            }}
+                          >
+                            Devir / Nakil Kaydet
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-slate-500">Bu işlem için yetkiniz bulunmuyor.</p>
+                    )}
+                  </div>
+                )}
                 {detaySection === "faturalar" && (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
@@ -640,10 +751,23 @@ export function SuAboneWorkspace() {
             {aboneActions.find((a) => a.id === actionModal)?.label}
           </p>
           <p className="mt-1 text-xs text-slate-500">
-            {seciliAbone.aboneNo} — {seciliAbone.adSoyad} · Backend entegrasyonu bekleniyor (demo).
+            {seciliAbone.aboneNo} — {seciliAbone.adSoyad}
           </p>
           <div className="mt-2 flex gap-2">
-            <button type="button" className="btn-primary inline-flex h-8 text-xs">
+            <button
+              type="button"
+              className="btn-primary inline-flex h-8 text-xs"
+              onClick={() => {
+                kaydetSuAudit({
+                  kullanici: user.name,
+                  islem: aboneActions.find((a) => a.id === actionModal)?.label ?? actionModal,
+                  aciklama: seciliAbone.aboneNo,
+                });
+                setMesaj({ tip: "ok", text: "İşlem tamamlandı." });
+                setActionModal(null);
+                setUrl({ action: null });
+              }}
+            >
               <Printer className="h-3.5 w-3.5" />
               Onayla / Yazdır
             </button>

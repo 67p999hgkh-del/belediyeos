@@ -70,6 +70,8 @@ export const suWorkspaces: Record<SuWorkspaceId, SuWorkspaceConfig> = {
       { id: "genel", label: "Genel", parentTab: "detay" },
       { id: "sayac", label: "Sayaç", parentTab: "detay" },
       { id: "borc-bakiye", label: "Borç & Bakiye", parentTab: "detay" },
+      { id: "abonelik-durumu", label: "Abonelik Durumu", parentTab: "detay" },
+      { id: "devir-nakil", label: "Devir / Nakil", parentTab: "detay" },
       { id: "faturalar", label: "Faturalar", parentTab: "detay" },
       { id: "hareketler", label: "Hareketler", parentTab: "detay" },
       { id: "belgeler", label: "Belgeler", parentTab: "detay" },
@@ -213,10 +215,10 @@ const leafRedirects: Record<string, Record<string, string>> = {
     iptal: "/su/fatura?tab=faturalandirma",
   },
   duzeltme: {
-    fatura: "/su/duzeltme",
-    abone: "/su/duzeltme",
-    sayac: "/su/duzeltme",
-    tahakkuk: "/su/duzeltme",
+    fatura: "/su/duzeltme?tur=fatura-duzeltme",
+    abone: "/su/duzeltme?tur=abone-duzeltme",
+    sayac: "/su/duzeltme?tur=sayac-okuma-duzeltme",
+    tahakkuk: "/su/duzeltme?tur=tahakkuk-duzeltme",
   },
   "el-terminali": {
     aktarim: "/su/el-terminali?tab=veri-al",

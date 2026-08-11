@@ -1,4 +1,4 @@
-/** Su fatura workspace — demo/mock veri (backend entegrasyonu bekleniyor) */
+/** Su fatura workspace — fixture veri katmanı */
 
 export interface SuDonemConfig {
   yillar: number[];

@@ -11,7 +11,6 @@ import { SuGenelFaturaWorkspace } from "./genel-fatura/SuGenelFaturaWorkspace";
 import { SuKanalizasyonWorkspace } from "./kanalizasyon/SuKanalizasyonWorkspace";
 import { SuKrediWorkspace } from "./kredi/SuKrediWorkspace";
 import { SuOnOdemeliSayacWorkspace } from "./on-odemeli/SuOnOdemeliSayacWorkspace";
-import { SuWorkspaceShell } from "./SuWorkspaceShell";
 
 interface SuWorkspaceContentProps {
   workspaceId: SuWorkspaceId;
@@ -28,5 +27,5 @@ export function SuWorkspaceContent({ workspaceId }: SuWorkspaceContentProps) {
   if (workspaceId === "ceza-indirimi") return <SuCezaIndirimiWorkspace />;
   if (workspaceId === "kanalizasyon") return <SuKanalizasyonWorkspace />;
   if (workspaceId === "on-odemeli-sayac") return <SuOnOdemeliSayacWorkspace />;
-  return <SuWorkspaceShell workspaceId={workspaceId} />;
+  return null;
 }

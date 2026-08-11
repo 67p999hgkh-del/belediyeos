@@ -192,5 +192,38 @@ export function getSuAboneBelgeler(aboneId: string): SuAboneBelge[] {
   return [];
 }
 
+export function kaydetSuAbone(input: {
+  aboneNo: string;
+  adSoyad: string;
+  kimlikNo: string;
+  adres: string;
+  telefon: string;
+  abonelikTuru: string;
+  tarifeGrubu: string;
+  sayacNo: string;
+  aciklama?: string;
+}): SuAboneKayit {
+  const kayit: SuAboneKayit = {
+    id: `a-${Date.now()}`,
+    aboneNo: input.aboneNo,
+    sicilNo: `S-${input.aboneNo.replace(/-/g, "")}`,
+    adSoyad: input.adSoyad,
+    kimlikNo: input.kimlikNo,
+    adres: input.adres,
+    telefon: input.telefon,
+    abonelikTuru: input.abonelikTuru,
+    tarifeGrubu: input.tarifeGrubu,
+    durum: "aktif",
+    sayacNo: input.sayacNo,
+    sonOkuma: "0",
+    sonOkumaTarihi: new Date().toLocaleDateString("tr-TR"),
+    guncelBorc: 0,
+    bakiye: 0,
+    aciklama: input.aciklama,
+  };
+  mockAboneler.push(kayit);
+  return kayit;
+}
+
 export const suAbonelikTurleri = ["Konut", "Ticari", "Kamu", "Tarimsal"];
 export const suTarifeGruplari = ["1. Grup", "2. Grup", "Ticari A", "Ticari B"];

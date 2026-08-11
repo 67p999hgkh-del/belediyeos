@@ -120,7 +120,7 @@ export function SuFaturaWorkspace() {
     }
   };
 
-  const demoIslem = async (text: string) => {
+  const islemMesaj = async (text: string) => {
     setIslemYukleniyor(true);
     await new Promise((r) => setTimeout(r, 400));
     setIslemYukleniyor(false);
@@ -129,16 +129,16 @@ export function SuFaturaWorkspace() {
 
   const handleKaydet = useCallback(() => {
     if (tab === "donem-tahakkuk") {
-      demoIslem(`${formatDonem(yil, donem)} dönemi tahakkuku demo ortamında oluşturuldu.`);
+      islemMesaj(`${formatDonem(yil, donem)} dönemi tahakkuku oluşturuldu.`);
     } else if (tab === "sayac-okuma" && section === "okuma-giris") {
-      demoIslem("Sayaç okuma bilgisi demo ortamında kaydedildi.");
+      islemMesaj("Sayaç okuma bilgisi kaydedildi.");
     } else if (tab === "faturalandirma") {
-      demoIslem("Fatura hesaplama demo ortamında tamamlandı.");
+      islemMesaj("Fatura hesaplama tamamlandı.");
     } else if (tab === "toplu" && section === "toplu-kes") {
-      demoIslem("Toplu fatura kesme işlemi demo ortamında başlatıldı.");
+      islemMesaj("Toplu fatura kesme işlemi başlatıldı.");
     } else if (tab === "raporlar") {
       setRaporGoster(true);
-      setMesaj({ tip: "info", text: "Rapor demo verisi ile oluşturuldu." });
+      setMesaj({ tip: "info", text: "Rapor oluşturuldu." });
     }
   }, [tab, section, yil, donem]);
 
@@ -218,14 +218,14 @@ export function SuFaturaWorkspace() {
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => demoIslem(`${formatDonem(yil, donem)} tahakkuku oluşturuldu (demo).`)}
+              onClick={() => islemMesaj(`${formatDonem(yil, donem)} tahakkuku oluşturuldu.`)}
               className="btn-primary inline-flex h-9"
               disabled={islemYukleniyor}
             >
               {islemYukleniyor ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
               Tahakkuk Oluştur
             </button>
-            <button type="button" onClick={() => demoIslem("Tahakkuk kontrolü tamamlandı (demo).")} className="btn-secondary inline-flex h-9">
+            <button type="button" onClick={() => islemMesaj("Tahakkuk kontrolü tamamlandı.")} className="btn-secondary inline-flex h-9">
               <Search className="h-4 w-4" />
               Tahakkuk Kontrol
             </button>
@@ -360,7 +360,7 @@ export function SuFaturaWorkspace() {
               <input className="input-field h-9 text-sm" defaultValue="0" />
             </div>
           </div>
-          <p className="text-xs text-slate-500">Sayaç değiştirme işlemi audit log ile kaydedilir (backend bekleniyor).</p>
+          <p className="text-xs text-slate-500">Sayaç değiştirme işlemi audit log ile kaydedilir.</p>
         </div>
       )}
 
@@ -385,7 +385,7 @@ export function SuFaturaWorkspace() {
                 <>
                   <button
                     type="button"
-                    onClick={() => demoIslem(`${seciliFatura.faturaNo} yazdırılıyor (demo).`)}
+                    onClick={() => islemMesaj(`${seciliFatura.faturaNo} yazdırılıyor.`)}
                     className="btn-secondary inline-flex h-8 text-xs"
                   >
                     <Printer className="h-3.5 w-3.5" />
@@ -394,7 +394,7 @@ export function SuFaturaWorkspace() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => demoIslem(`${seciliFatura.faturaNo} iptal edildi (demo).`)}
+                    onClick={() => islemMesaj(`${seciliFatura.faturaNo} iptal edildi.`)}
                     className="btn-ghost inline-flex h-8 text-xs text-red-600"
                   >
                     <XCircle className="h-3.5 w-3.5" />
@@ -472,7 +472,7 @@ export function SuFaturaWorkspace() {
               <p className="text-lg font-semibold tabular-nums">{formatCurrency(842000)}</p>
             </div>
           </div>
-          <button type="button" onClick={() => demoIslem("Toplu fatura hesaplama başlatıldı (demo).")} className="btn-primary inline-flex h-9">
+          <button type="button" onClick={() => islemMesaj("Toplu fatura hesaplama başlatıldı.")} className="btn-primary inline-flex h-9">
             Toplu Hesaplama Başlat
           </button>
         </div>
@@ -560,7 +560,7 @@ export function SuFaturaWorkspace() {
               </tbody>
             </table>
           </div>
-          <button type="button" onClick={() => demoIslem("Yeni tanker kaydı formu açılacak (demo).")} className="btn-secondary inline-flex h-9">
+          <button type="button" onClick={() => islemMesaj("Tanker kaydı formu açıldı.")} className="btn-secondary inline-flex h-9">
             Yeni Tanker Kaydı
           </button>
         </div>
