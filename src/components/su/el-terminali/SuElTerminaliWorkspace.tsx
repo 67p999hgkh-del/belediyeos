@@ -90,14 +90,14 @@ export function SuElTerminaliWorkspace() {
   const handleHazirla = useCallback(async () => {
     setIslemYukleniyor(true);
     await new Promise((r) => setTimeout(r, 400));
-    const sonuc = hazirlaSuOkumaVerisi(donemStr, user.name);
+    const sonuc = hazirlaSuOkumaVerisi(donemStr, seciliTerminal, user.name);
     setHazirlikSonuc(sonuc);
     setIslemYukleniyor(false);
     setMesaj({
       tip: "ok",
       text: `${donemStr} dönemi okuma paketi hazırlandı (${sonuc.dosyaAdi}).`,
     });
-  }, [donemStr, user.name]);
+  }, [donemStr, seciliTerminal, user.name]);
 
   const handleDosyaSec = () => {
     setDosyaAdi(`okuma_${String(yil)}${String(donem).padStart(2, "0")}.et`);

@@ -1,63 +1,26 @@
+import { suDemoOnOdemeliSistemler, suOnOdemeliSistemConfig } from "@/lib/su/config";
+import { SU_DEMO_BIRIM_FIYAT, suMockStore } from "@/lib/su/mock-store";
+import type { SuOnOdemeliSatis, SuOnOdemeliSistem } from "@/lib/su/types";
 import { kaydetSuAudit } from "./su-audit";
 
-export type SuOnOdemeliSistem = "Baylan" | "Cem";
+export type { SuOnOdemeliSatis, SuOnOdemeliSistem };
 
-export interface SuOnOdemeliSatis {
-  id: string;
-  sistem: SuOnOdemeliSistem;
-  aboneNo: string;
-  adSoyad: string;
-  kartNo: string;
-  islem: string;
-  tutar: number;
-  tarih: string;
-  durum: "basarili" | "iptal";
-}
-
+/** Demo sistem listesi — legacy ekran detayı henüz doğrulanmadı */
 export const suOnOdemeliConfig = {
-  varsayilanSistem: "Baylan" as SuOnOdemeliSistem,
-  sistemler: ["Baylan", "Cem"] as SuOnOdemeliSistem[],
+  legacyDogrulandi: suOnOdemeliSistemConfig.legacyDogrulandi,
+  sistemler: [...suDemoOnOdemeliSistemler] as SuOnOdemeliSistem[],
+  varsayilanSistem: suDemoOnOdemeliSistemler[0] as SuOnOdemeliSistem,
 };
 
-const satislar: SuOnOdemeliSatis[] = [
-  {
-    id: "s1",
-    sistem: "Baylan",
-    aboneNo: "45-67-89-01",
-    adSoyad: "Ali Veli",
-    kartNo: "BL-88442211",
-    islem: "Kart Yükleme",
-    tutar: 200,
-    tarih: "10.08.2026 11:30",
-    durum: "basarili",
-  },
-  {
-    id: "s2",
-    sistem: "Cem",
-    aboneNo: "33-44-55-66",
-    adSoyad: "Fatma Yıldız",
-    kartNo: "CM-11223344",
-    islem: "Fatura Hesaplama",
-    tutar: 85,
-    tarih: "09.08.2026 15:12",
-    durum: "basarili",
-  },
-];
-
 export function getSuOnOdemeliSatislar(sistem?: SuOnOdemeliSistem): SuOnOdemeliSatis[] {
-  if (!sistem) return satislar;
-  return satislar.filter((s) => s.sistem === sistem);
+  if (!sistem) return suMockStore.onOdemeliSatislar;
+  return suMockStore.onOdemeliSatislar.filter((s) => s.sistem === sistem);
 }
 
 export function okuSuOnOdemeliKart(sistem: SuOnOdemeliSistem, kartNo: string) {
-  return {
-    sistem,
-    kartNo,
-    aboneNo: sistem === "Baylan" ? "45-67-89-01" : "33-44-55-66",
-    adSoyad: sistem === "Baylan" ? "Ali Veli" : "Fatma Yıldız",
-    bakiye: sistem === "Baylan" ? 142.5 : 68.0,
-    sonIslem: "10.08.2026",
-  };
+  const kart = suMockStore.onOdemeliKartlar[kartNo];
+  if (!kart) return null;
+  return { sistem, kartNo, ...kart };
 }
 
 export function islemSuOnOdemeliKart(input: {
@@ -66,25 +29,22 @@ export function islemSuOnOdemeliKart(input: {
   islem: string;
   tutar: number;
   kullanici: string;
-}): SuOnOdemeliSatis {
+}): SuOnOdemeliSatis | null {
+  const kart = okuSuOnOdemeliKart(input.sistem, input.kartNo);
+  if (!kart) return null;
   const satis: SuOnOdemeliSatis = {
     id: `s-${Date.now()}`,
     sistem: input.sistem,
-    aboneNo: input.sistem === "Baylan" ? "45-67-89-01" : "33-44-55-66",
-    adSoyad: input.sistem === "Baylan" ? "Ali Veli" : "Fatma Yıldız",
+    aboneNo: kart.aboneNo,
+    adSoyad: kart.adSoyad,
     kartNo: input.kartNo,
     islem: input.islem,
     tutar: input.tutar,
     tarih: new Date().toLocaleString("tr-TR"),
     durum: "basarili",
   };
-  satislar.unshift(satis);
-  kaydetSuAudit({
-    kullanici: input.kullanici,
-    islem: `${input.sistem} — ${input.islem}`,
-    yeniDeger: String(input.tutar),
-    aciklama: input.kartNo,
-  });
+  suMockStore.onOdemeliSatislar.unshift(satis);
+  kaydetSuAudit({ kullanici: input.kullanici, islem: `${input.sistem} — ${input.islem}`, yeniDeger: String(input.tutar), aciklama: input.kartNo });
   return satis;
 }
 
@@ -94,12 +54,9 @@ export function hesaplaSuOnOdemeliFatura(input: {
   tuketim: number;
   kullanici: string;
 }) {
-  const tutar = input.tuketim * 23.5;
-  kaydetSuAudit({
-    kullanici: input.kullanici,
-    islem: "Ön Ödemeli Fatura Hesaplama",
-    yeniDeger: String(tutar),
-    aciklama: input.kartNo,
-  });
+  const kart = okuSuOnOdemeliKart(input.sistem, input.kartNo);
+  if (!kart) return null;
+  const tutar = input.tuketim * SU_DEMO_BIRIM_FIYAT;
+  kaydetSuAudit({ kullanici: input.kullanici, islem: "Ön Ödemeli Fatura Hesaplama", yeniDeger: String(tutar), aciklama: input.kartNo });
   return { tuketim: input.tuketim, tutar, sonOdeme: "15.09.2026" };
 }

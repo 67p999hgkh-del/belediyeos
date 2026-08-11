@@ -100,8 +100,13 @@ export function SuOnOdemeliSayacWorkspace() {
     setIslemYukleniyor(true);
     await new Promise((r) => setTimeout(r, 300));
     const bilgi = okuSuOnOdemeliKart(sistem, kartNo.trim());
-    setKartBilgi(bilgi);
     setIslemYukleniyor(false);
+    if (!bilgi) {
+      setKartBilgi(null);
+      setMesaj({ tip: "err", text: "Kart bulunamadı." });
+      return;
+    }
+    setKartBilgi(bilgi);
     setMesaj({ tip: "ok", text: `${sistem} kartı okundu.` });
   };
 

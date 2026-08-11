@@ -49,7 +49,7 @@ export function SuCezaIndirimiWorkspace() {
   const [listeVersiyon, setListeVersiyon] = useState(0);
 
   const [aboneParca, setAboneParca] = useState(["", "", "", ""]);
-  const [indirimOrani, setIndirimOrani] = useState("50");
+  const [indirimOrani, setIndirimOrani] = useState("");
   const [gerekce, setGerekce] = useState("");
   const [seciliBasvuruId, setSeciliBasvuruId] = useState<string | null>(basvuruParam);
 
@@ -131,12 +131,12 @@ export function SuCezaIndirimiWorkspace() {
     setListeVersiyon((v) => v + 1);
     setMesaj({ tip: "ok", text: `${basvuru.basvuruNo} numaralı başvuru oluşturuldu.` });
     setGerekce("");
-    setIndirimOrani("50");
+    setIndirimOrani("");
   }, [tab, yetkili, abone, borclar.length, gerekce, oran, user.name]);
 
   const handleIptal = useCallback(() => {
     setAboneParca(["", "", "", ""]);
-    setIndirimOrani("50");
+    setIndirimOrani("");
     setGerekce("");
     setMesaj(null);
     setSeciliBasvuruId(null);

@@ -1,62 +1,20 @@
+import { suMockStore } from "@/lib/su/mock-store";
+import type { SuCezaBasvuru, SuCezaBorc } from "@/lib/su/types";
 import { kaydetSuAudit } from "./su-audit";
 
-export interface SuCezaBasvuru {
-  id: string;
-  basvuruNo: string;
-  aboneNo: string;
-  adSoyad: string;
-  basvuruTarihi: string;
-  durum: "acik" | "onaylandi" | "reddedildi";
-  toplamBorc: number;
-  cezaTutar: number;
-  indirimOrani: number;
-  indirimTutar: number;
-  yeniBorc: number;
-  gerekce: string;
-}
-
-export interface SuCezaBorc {
-  id: string;
-  donem: string;
-  gelirKodu: string;
-  tutar: number;
-  ceza: number;
-  secili?: boolean;
-}
-
-const basvurular: SuCezaBasvuru[] = [
-  {
-    id: "cb1",
-    basvuruNo: "CI-2026-0012",
-    aboneNo: "12-34-56-78",
-    adSoyad: "Mehmet Demir",
-    basvuruTarihi: "05.08.2026",
-    durum: "acik",
-    toplamBorc: 838,
-    cezaTutar: 42,
-    indirimOrani: 50,
-    indirimTutar: 21,
-    yeniBorc: 817,
-    gerekce: "Maddi zorluk",
-  },
-];
+export type { SuCezaBasvuru, SuCezaBorc };
 
 export function getSuCezaBasvurular(): SuCezaBasvuru[] {
-  return basvurular;
+  return suMockStore.cezaBasvurular;
 }
 
 export function getSuCezaBasvuru(id: string): SuCezaBasvuru | undefined {
-  return basvurular.find((b) => b.id === id);
+  return suMockStore.cezaBasvurular.find((b) => b.id === id);
 }
 
 export function getSuCezaBorclari(aboneNo: string): SuCezaBorc[] {
-  if (aboneNo.includes("12-34")) {
-    return [
-      { id: "b1", donem: "2026/1", gelirKodu: "101", tutar: 420, ceza: 21 },
-      { id: "b2", donem: "2025/4", gelirKodu: "101", tutar: 418, ceza: 21 },
-    ];
-  }
-  return [];
+  const normalized = aboneNo.replace(/\s/g, "");
+  return suMockStore.cezaBorclari[normalized] ?? suMockStore.cezaBorclari[aboneNo] ?? [];
 }
 
 export function kaydetSuCezaBasvuru(input: {
@@ -72,7 +30,7 @@ export function kaydetSuCezaBasvuru(input: {
   const indirimTutar = (cezaTutar * input.indirimOrani) / 100;
   const basvuru: SuCezaBasvuru = {
     id: `cb-${Date.now()}`,
-    basvuruNo: `CI-2026-${String(basvurular.length + 13).padStart(4, "0")}`,
+    basvuruNo: `CI-2026-${String(suMockStore.cezaBasvurular.length + 13).padStart(4, "0")}`,
     aboneNo: input.aboneNo,
     adSoyad: input.adSoyad,
     basvuruTarihi: new Date().toLocaleDateString("tr-TR"),
@@ -84,14 +42,8 @@ export function kaydetSuCezaBasvuru(input: {
     yeniBorc: toplamBorc + cezaTutar - indirimTutar,
     gerekce: input.gerekce,
   };
-  basvurular.unshift(basvuru);
-  kaydetSuAudit({
-    kullanici: input.kullanici,
-    islem: "Ceza İndirimi Başvurusu",
-    yeniDeger: `%${input.indirimOrani}`,
-    gerekce: input.gerekce,
-    aciklama: input.aboneNo,
-  });
+  suMockStore.cezaBasvurular.unshift(basvuru);
+  kaydetSuAudit({ kullanici: input.kullanici, islem: "Ceza İndirimi Başvurusu", yeniDeger: `%${input.indirimOrani}`, gerekce: input.gerekce, aciklama: input.aboneNo });
   return basvuru;
 }
 
@@ -101,11 +53,7 @@ export function getSuCezaOdemeEkstre(basvuruId: string) {
   return {
     basvuruNo: b.basvuruNo,
     aboneNo: b.aboneNo,
-    satirlar: getSuCezaBorclari(b.aboneNo).map((x) => ({
-      donem: x.donem,
-      borc: x.tutar,
-      ceza: x.ceza,
-    })),
+    satirlar: getSuCezaBorclari(b.aboneNo).map((x) => ({ donem: x.donem, borc: x.tutar, ceza: x.ceza })),
     indirim: b.indirimTutar,
     yeniToplam: b.yeniBorc,
   };
@@ -114,12 +62,5 @@ export function getSuCezaOdemeEkstre(basvuruId: string) {
 export function getSuCezaTaahhutname(basvuruId: string) {
   const b = getSuCezaBasvuru(basvuruId);
   if (!b) return null;
-  return {
-    basvuruNo: b.basvuruNo,
-    aboneNo: b.aboneNo,
-    adSoyad: b.adSoyad,
-    indirimOrani: b.indirimOrani,
-    yeniBorc: b.yeniBorc,
-    tarih: b.basvuruTarihi,
-  };
+  return { basvuruNo: b.basvuruNo, aboneNo: b.aboneNo, adSoyad: b.adSoyad, indirimOrani: b.indirimOrani, yeniBorc: b.yeniBorc, tarih: b.basvuruTarihi };
 }

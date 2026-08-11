@@ -9,9 +9,13 @@ import {
   Printer,
 } from "lucide-react";
 import { useApp } from "@/context/AppContext";
-import { formatAboneNo, getSuAboneByAboneNo } from "@/lib/su-abone-mock";
-import { suDonemConfig } from "@/lib/su-fatura-mock";
 import {
+  formatAboneNo,
+  getSuAboneByAboneNo,
+} from "@/lib/su-abone-mock";
+import { suDonemConfig } from "@/lib/su/config";
+import {
+  getSuKrediByAboneNo,
   getSuKrediListesi,
   getSuKrediRapor,
   kaydetSuKrediGeriOdeme,
@@ -50,12 +54,12 @@ export function SuKrediWorkspace() {
   const [aboneParca, setAboneParca] = useState(["", "", "", ""]);
   const [tutar, setTutar] = useState("");
 
-  const [raporTuru, setRaporTuru] = useState(suKrediRaporTurleri[0].id);
+  const [raporTuru, setRaporTuru] = useState<string>(suKrediRaporTurleri[0].id);
   const [raporGoster, setRaporGoster] = useState(false);
 
   const aboneNo = formatAboneNo(aboneParca);
   const abone = aboneNo ? getSuAboneByAboneNo(aboneNo) : undefined;
-  const kredi = krediler.find((k) => k.aboneNo === aboneNo);
+  const kredi = aboneNo ? getSuKrediByAboneNo(aboneNo) : undefined;
 
   useEffect(() => {
     setTab(tabParam);
@@ -80,16 +84,16 @@ export function SuKrediWorkspace() {
         return;
       }
       if (!kredi) {
-        setMesaj({ tip: "err", text: "Bu abone için aktif kredi kaydı bulunamadı." });
+        setMesaj({ tip: "err", text: "Bu abone için kredi kaydı bulunamadı." });
+        return;
+      }
+      if (kredi.durum !== "aktif") {
+        setMesaj({ tip: "err", text: "Kapalı kredi kaydı için geri ödeme yapılamaz." });
         return;
       }
       const tutarNum = parseFloat(tutar.replace(",", "."));
       if (!tutarNum || tutarNum <= 0) {
         setMesaj({ tip: "err", text: "Geçerli bir tutar giriniz." });
-        return;
-      }
-      if (tutarNum > kredi.kalan) {
-        setMesaj({ tip: "err", text: `Kalan kredi tutarı: ${formatCurrency(kredi.kalan)}` });
         return;
       }
 
@@ -161,9 +165,6 @@ export function SuKrediWorkspace() {
                 <tr className="border-b border-slate-200">
                   <th className="px-3 py-2 text-left">Abone No</th>
                   <th className="px-3 py-2 text-left">Adı Soyadı</th>
-                  <th className="px-3 py-2 text-right">Kredi Tutarı</th>
-                  <th className="px-3 py-2 text-right">Kullanılan</th>
-                  <th className="px-3 py-2 text-right">Kalan</th>
                   <th className="px-3 py-2 text-left">Son İşlem</th>
                   <th className="px-3 py-2 text-left">Durum</th>
                 </tr>
@@ -171,7 +172,7 @@ export function SuKrediWorkspace() {
               <tbody>
                 {krediler.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-slate-400">
+                    <td colSpan={4} className="px-4 py-8 text-center text-slate-400">
                       Kredi kaydı bulunmuyor.
                     </td>
                   </tr>
@@ -180,15 +181,6 @@ export function SuKrediWorkspace() {
                     <tr key={k.id} className="h-10 border-b border-slate-100 hover:bg-slate-50/70">
                       <td className="px-3 py-1.5 font-mono text-xs">{k.aboneNo}</td>
                       <td className="px-3 py-1.5">{k.adSoyad}</td>
-                      <td className="px-3 py-1.5 text-right tabular-nums">
-                        {formatCurrency(k.krediTutar)}
-                      </td>
-                      <td className="px-3 py-1.5 text-right tabular-nums">
-                        {formatCurrency(k.kullanilan)}
-                      </td>
-                      <td className="px-3 py-1.5 text-right font-medium tabular-nums text-[#1e40af]">
-                        {formatCurrency(k.kalan)}
-                      </td>
                       <td className="px-3 py-1.5 text-slate-600">{k.sonIslem}</td>
                       <td className="px-3 py-1.5">{krediDurumBadge(k.durum)}</td>
                     </tr>
@@ -203,18 +195,12 @@ export function SuKrediWorkspace() {
       {tab === "geri-odeme" && (
         <div className="space-y-4 p-4">
           <AboneNoInput value={aboneParca} onChange={setAboneParca} />
-          {abone && (
+          {abone && kredi && (
             <p className="text-sm text-slate-600">
               <span className="font-medium">{abone.adSoyad}</span>
-              {kredi && (
-                <>
-                  <span className="mx-2 text-slate-300">·</span>
-                  Kalan kredi:{" "}
-                  <span className="font-semibold tabular-nums text-[#1e40af]">
-                    {formatCurrency(kredi.kalan)}
-                  </span>
-                </>
-              )}
+              <span className="mx-2 text-slate-300">·</span>
+              Son işlem:{" "}
+              <span className="font-semibold tabular-nums text-[#1e40af]">{kredi.sonIslem}</span>
             </p>
           )}
           <div className="max-w-xs">
@@ -278,8 +264,9 @@ export function SuKrediWorkspace() {
                       <>
                         <th className="px-3 py-2 text-left">Abone No</th>
                         <th className="px-3 py-2 text-left">Adı Soyadı</th>
-                        <th className="px-3 py-2 text-right">Kullanılan</th>
+                        <th className="px-3 py-2 text-left">Son İşlem</th>
                         <th className="px-3 py-2 text-left">Dönem</th>
+                        <th className="px-3 py-2 text-left">Durum</th>
                       </>
                     ) : (
                       <>
@@ -305,10 +292,9 @@ export function SuKrediWorkspace() {
                           {(row as { aboneNo: string }).aboneNo}
                         </td>
                         <td className="px-3 py-1.5">{(row as { adSoyad: string }).adSoyad}</td>
-                        <td className="px-3 py-1.5 text-right tabular-nums">
-                          {formatCurrency((row as { kullanilan: number }).kullanilan)}
-                        </td>
+                        <td className="px-3 py-1.5">{(row as { sonIslem: string }).sonIslem}</td>
                         <td className="px-3 py-1.5">{(row as { donem: string }).donem}</td>
+                        <td className="px-3 py-1.5">{(row as { durum: string }).durum}</td>
                       </tr>
                     ))
                   ) : (

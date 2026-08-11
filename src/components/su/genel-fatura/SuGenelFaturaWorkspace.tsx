@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { formatAboneNo, getSuAboneByAboneNo } from "@/lib/su-abone-mock";
-import { formatDonem, suDonemConfig, suGelirKodlari } from "@/lib/su-fatura-mock";
+import { formatDonem, suDonemConfig, suDemoGelirKodlari, suGelirKodlari } from "@/lib/su/config";
 import {
   getSuGenelFaturaEkstre,
   getSuGenelFaturalar,
@@ -23,6 +23,8 @@ import { cn, formatCurrency } from "@/lib/utils";
 import { AboneNoInput, IslemActionBar, WorkspaceTabBar } from "../shared";
 import { useSuKlavye } from "../shared/useSuKlavye";
 import { useSuWorkspaceUrl } from "../shared/useSuWorkspaceUrl";
+
+const gelirKoduSecenekleri = [...suGelirKodlari, ...suDemoGelirKodlari];
 
 const ws = suWorkspaces["genel-fatura"];
 
@@ -39,7 +41,7 @@ export function SuGenelFaturaWorkspace() {
   const [kayitDurum, setKayitDurum] = useState<KayitDurum>("idle");
 
   const [aboneParca, setAboneParca] = useState(["", "", "", ""]);
-  const [gelirKodu, setGelirKodu] = useState("199");
+  const [gelirKodu, setGelirKodu] = useState("");
   const [aciklama, setAciklama] = useState("");
   const [tutar, setTutar] = useState("");
   const [yil, setYil] = useState(suDonemConfig.aktifYil);
@@ -72,6 +74,10 @@ export function SuGenelFaturaWorkspace() {
     }
     if (!abone) {
       setMesaj({ tip: "err", text: "Abone bulunamadı." });
+      return;
+    }
+    if (!gelirKodu) {
+      setMesaj({ tip: "err", text: "Gelir kodu seçiniz." });
       return;
     }
     if (!aciklama.trim()) {
@@ -107,7 +113,7 @@ export function SuGenelFaturaWorkspace() {
 
   const handleIptal = useCallback(() => {
     setAboneParca(["", "", "", ""]);
-    setGelirKodu("199");
+    setGelirKodu("");
     setAciklama("");
     setTutar("");
     setYil(suDonemConfig.aktifYil);
@@ -181,7 +187,8 @@ export function SuGenelFaturaWorkspace() {
                 value={gelirKodu}
                 onChange={(e) => setGelirKodu(e.target.value)}
               >
-                {suGelirKodlari.map((g) => (
+                <option value="">Seçiniz</option>
+                {gelirKoduSecenekleri.map((g) => (
                   <option key={g.kod} value={g.kod}>
                     {g.kod} — {g.ad}
                   </option>

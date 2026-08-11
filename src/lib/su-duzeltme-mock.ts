@@ -1,10 +1,9 @@
+import { suMockStore } from "@/lib/su/mock-store";
+import type { SuDuzeltmeTur } from "@/lib/su/types";
+import { getSuAboneByAboneNo } from "./su-abone-mock";
 import { kaydetSuAudit } from "./su-audit";
 
-export type SuDuzeltmeTur =
-  | "fatura-duzeltme"
-  | "abone-duzeltme"
-  | "sayac-okuma-duzeltme"
-  | "tahakkuk-duzeltme";
+export type { SuDuzeltmeTur };
 
 export interface SuDuzeltmeTurConfig {
   id: SuDuzeltmeTur;
@@ -13,42 +12,10 @@ export interface SuDuzeltmeTurConfig {
 }
 
 export const suDuzeltmeTurleri: SuDuzeltmeTurConfig[] = [
-  {
-    id: "fatura-duzeltme",
-    label: "Fatura Düzeltme",
-    alanlar: [
-      { key: "faturaNo", label: "Fatura No" },
-      { key: "tutar", label: "Tutar" },
-      { key: "sonOdeme", label: "Son Ödeme Tarihi" },
-    ],
-  },
-  {
-    id: "abone-duzeltme",
-    label: "Abone Düzeltme",
-    alanlar: [
-      { key: "adSoyad", label: "Adı Soyadı" },
-      { key: "adres", label: "Adres" },
-      { key: "tarife", label: "Tarife Grubu" },
-    ],
-  },
-  {
-    id: "sayac-okuma-duzeltme",
-    label: "Sayaç Okuma Düzeltme",
-    alanlar: [
-      { key: "sayacNo", label: "Sayaç No" },
-      { key: "okuma", label: "Okuma Değeri" },
-      { key: "donem", label: "Dönem" },
-    ],
-  },
-  {
-    id: "tahakkuk-duzeltme",
-    label: "Tahakkuk Düzeltme",
-    alanlar: [
-      { key: "donem", label: "Dönem" },
-      { key: "tahakkukTutar", label: "Tahakkuk Tutarı" },
-      { key: "aboneSayisi", label: "Abone Sayısı" },
-    ],
-  },
+  { id: "fatura-duzeltme", label: "Fatura Düzeltme", alanlar: [{ key: "faturaNo", label: "Fatura No" }, { key: "tutar", label: "Tutar" }, { key: "sonOdeme", label: "Son Ödeme Tarihi" }] },
+  { id: "abone-duzeltme", label: "Abone Düzeltme", alanlar: [{ key: "adSoyad", label: "Adı Soyadı" }, { key: "adres", label: "Adres" }, { key: "tarife", label: "Tarife Grubu" }] },
+  { id: "sayac-okuma-duzeltme", label: "Sayaç Okuma Düzeltme", alanlar: [{ key: "sayacNo", label: "Sayaç No" }, { key: "okuma", label: "Okuma Değeri" }, { key: "donem", label: "Dönem" }] },
+  { id: "tahakkuk-duzeltme", label: "Tahakkuk Düzeltme", alanlar: [{ key: "donem", label: "Dönem" }, { key: "tahakkukTutar", label: "Tahakkuk Tutarı" }, { key: "aboneSayisi", label: "Abone Sayısı" }] },
 ];
 
 export interface SuDuzeltmeKayit {
@@ -63,22 +30,8 @@ export interface SuDuzeltmeKayit {
   tarih: string;
 }
 
-const kayitlar: SuDuzeltmeKayit[] = [
-  {
-    id: "d1",
-    tur: "sayac-okuma-duzeltme",
-    aboneNo: "12-34-56-78",
-    referans: "2026/1 Okuma",
-    eskiDeger: "1258",
-    yeniDeger: "1256",
-    gerekce: "Okuma giriş hatası",
-    kullanici: "Ayşe Yılmaz",
-    tarih: "10.08.2026 14:22",
-  },
-];
-
 export function getSuDuzeltmeKayitlari(): SuDuzeltmeKayit[] {
-  return kayitlar;
+  return suMockStore.duzeltmeKayitlari;
 }
 
 export function kaydetSuDuzeltme(input: {
@@ -91,42 +44,32 @@ export function kaydetSuDuzeltme(input: {
   kullanici: string;
 }): SuDuzeltmeKayit {
   const turLabel = suDuzeltmeTurleri.find((t) => t.id === input.tur)?.label ?? input.tur;
-  const kayit: SuDuzeltmeKayit = {
-    id: `d-${Date.now()}`,
-    ...input,
-    tarih: new Date().toLocaleString("tr-TR"),
-  };
-  kayitlar.unshift(kayit);
-  kaydetSuAudit({
-    kullanici: input.kullanici,
-    islem: turLabel,
-    eskiDeger: input.eskiDeger,
-    yeniDeger: input.yeniDeger,
-    gerekce: input.gerekce,
-    aciklama: `${input.aboneNo} — ${input.referans}`,
-  });
+  const kayit: SuDuzeltmeKayit = { id: `d-${Date.now()}`, ...input, tarih: new Date().toLocaleString("tr-TR") };
+  suMockStore.duzeltmeKayitlari.unshift(kayit);
+  kaydetSuAudit({ kullanici: input.kullanici, islem: turLabel, eskiDeger: input.eskiDeger, yeniDeger: input.yeniDeger, gerekce: input.gerekce, aciklama: `${input.aboneNo} — ${input.referans}` });
   return kayit;
 }
 
-export function bulSuDuzeltmeReferans(tur: SuDuzeltmeTur, arama: string) {
+export function bulSuDuzeltmeReferans(tur: SuDuzeltmeTur, arama: string): { referans: string; eski: Record<string, string> } | null {
   if (!arama.trim()) return null;
-  const ornekler: Record<SuDuzeltmeTur, { referans: string; eski: Record<string, string> }> = {
-    "fatura-duzeltme": {
-      referans: "SU-2026-00142",
-      eski: { faturaNo: "SU-2026-00142", tutar: "420,00", sonOdeme: "15.08.2026" },
-    },
-    "abone-duzeltme": {
-      referans: arama,
-      eski: { adSoyad: "Mehmet Demir", adres: "Erenköy Mah.", tarife: "1. Grup" },
-    },
-    "sayac-okuma-duzeltme": {
-      referans: "2026/1",
-      eski: { sayacNo: "SC-88421", okuma: "1258", donem: "2026/1" },
-    },
-    "tahakkuk-duzeltme": {
-      referans: "2026/1",
-      eski: { donem: "2026/1", tahakkukTutar: "842.000,00", aboneSayisi: "2184" },
-    },
-  };
-  return ornekler[tur];
+  const abone = getSuAboneByAboneNo(arama) ?? suMockStore.aboneler.find((a) => a.sicilNo.includes(arama) || a.aboneNo.includes(arama));
+  if (tur === "fatura-duzeltme") {
+    const f = suMockStore.faturalar.find((x) => x.faturaNo.includes(arama) || x.aboneNo.includes(arama));
+    if (!f) return null;
+    return { referans: f.faturaNo, eski: { faturaNo: f.faturaNo, tutar: String(f.tutar), sonOdeme: f.sonOdeme } };
+  }
+  if (tur === "abone-duzeltme" && abone) {
+    return { referans: abone.aboneNo, eski: { adSoyad: abone.adSoyad, adres: abone.adres, tarife: abone.tarifeGrubu } };
+  }
+  if (tur === "sayac-okuma-duzeltme") {
+    const o = suMockStore.okumalar.find((x) => x.aboneNo.includes(arama) || x.sayacNo.includes(arama));
+    if (!o) return null;
+    return { referans: "2026/1", eski: { sayacNo: o.sayacNo, okuma: String(o.yeniOkuma), donem: "2026/1" } };
+  }
+  if (tur === "tahakkuk-duzeltme") {
+    const t = suMockStore.tahakkuklar[0];
+    if (!t) return null;
+    return { referans: `${t.yil}/${t.donem}`, eski: { donem: `${t.yil}/${t.donem}`, tahakkukTutar: String(t.tahakkukTutar), aboneSayisi: String(t.aboneSayisi) } };
+  }
+  return null;
 }

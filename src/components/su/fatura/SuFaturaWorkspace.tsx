@@ -13,6 +13,8 @@ import {
   Search,
   XCircle,
 } from "lucide-react";
+import { useApp } from "@/context/AppContext";
+import { formatAboneNo } from "@/lib/su-abone-mock";
 import {
   formatDonem,
   getSuEkHizmetBorclari,
@@ -21,6 +23,14 @@ import {
   getSuSayacOkumalar,
   getSuTahakkuklar,
   getSuTankerKayitlari,
+  hesaplaSuTekilFatura,
+  iptalSuFatura,
+  kaydetSuSayacOkuma,
+  kesSuFatura,
+  kontrolSuTahakkuk,
+  olusturSuTahakkuk,
+  topluHesaplaSuFatura,
+  topluKesSuFatura,
   suDonemConfig,
   suGelirKodlari,
   suRaporTurleri,
@@ -63,6 +73,7 @@ function faturaDurumBadge(durum: SuFaturaKayit["durum"]) {
 export function SuFaturaWorkspace() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user } = useApp();
 
   const tabParam = searchParams.get("tab") ?? "donem-tahakkuk";
   const sectionParam = searchParams.get("section") ?? "okuma-liste";
@@ -78,8 +89,9 @@ export function SuFaturaWorkspace() {
   const [tekilAboneParca, setTekilAboneParca] = useState(["", "", "", ""]);
   const [okumaAboneParca, setOkumaAboneParca] = useState(["", "", "", ""]);
   const [okumaForm, setOkumaForm] = useState({ onceki: "", yeni: "" });
-  const [raporTuru, setRaporTuru] = useState(suRaporTurleri[0].id);
+  const [raporTuru, setRaporTuru] = useState<string>(suRaporTurleri[0].id);
   const [raporGoster, setRaporGoster] = useState(false);
+  const [dataVersiyon, setDataVersiyon] = useState(0);
 
   const setUrl = useCallback(
     (next: { tab?: string; section?: string }) => {
@@ -96,11 +108,11 @@ export function SuFaturaWorkspace() {
     setSection(sectionParam);
   }, [tabParam, sectionParam]);
 
-  const tahakkuklar = useMemo(() => getSuTahakkuklar(yil, donem), [yil, donem]);
-  const okumalar = useMemo(() => getSuSayacOkumalar(yil, donem), [yil, donem]);
-  const faturalar = useMemo(() => getSuFaturaListesi(yil, donem), [yil, donem]);
-  const ekHizmetler = useMemo(() => getSuEkHizmetBorclari(yil, donem), [yil, donem]);
-  const tankerKayitlari = useMemo(() => getSuTankerKayitlari(), []);
+  const tahakkuklar = useMemo(() => getSuTahakkuklar(yil, donem), [yil, donem, dataVersiyon]);
+  const okumalar = useMemo(() => getSuSayacOkumalar(yil, donem), [yil, donem, dataVersiyon]);
+  const faturalar = useMemo(() => getSuFaturaListesi(yil, donem), [yil, donem, dataVersiyon]);
+  const ekHizmetler = useMemo(() => getSuEkHizmetBorclari(yil, donem), [yil, donem, dataVersiyon]);
+  const tankerKayitlari = useMemo(() => getSuTankerKayitlari(), [dataVersiyon]);
   const raporSonuc = useMemo(
     () => (raporGoster ? getSuRaporSonuc(raporTuru, yil, donem) : []),
     [raporGoster, raporTuru, yil, donem],
@@ -128,19 +140,51 @@ export function SuFaturaWorkspace() {
   };
 
   const handleKaydet = useCallback(() => {
+    const aboneNo = formatAboneNo(tekilAboneParca.length ? tekilAboneParca : okumaAboneParca);
     if (tab === "donem-tahakkuk") {
-      islemMesaj(`${formatDonem(yil, donem)} dönemi tahakkuku oluşturuldu.`);
+      olusturSuTahakkuk(yil, donem, user.name);
+      setDataVersiyon((v) => v + 1);
+      setMesaj({ tip: "ok", text: `${formatDonem(yil, donem)} dönemi tahakkuku oluşturuldu.` });
     } else if (tab === "sayac-okuma" && section === "okuma-giris") {
-      islemMesaj("Sayaç okuma bilgisi kaydedildi.");
+      if (!aboneNo) {
+        setMesaj({ tip: "err", text: "Abone no giriniz." });
+        return;
+      }
+      const onceki = parseFloat(okumaForm.onceki);
+      const yeni = parseFloat(okumaForm.yeni);
+      if (Number.isNaN(onceki) || Number.isNaN(yeni) || yeni < onceki) {
+        setMesaj({ tip: "err", text: "Geçerli okuma değerleri giriniz." });
+        return;
+      }
+      kaydetSuSayacOkuma({ aboneNo, oncekiOkuma: onceki, yeniOkuma: yeni, kullanici: user.name });
+      setDataVersiyon((v) => v + 1);
+      setMesaj({ tip: "ok", text: "Sayaç okuma bilgisi kaydedildi." });
     } else if (tab === "faturalandirma") {
-      islemMesaj("Fatura hesaplama tamamlandı.");
+      if (!aboneNo) {
+        setMesaj({ tip: "err", text: "Abone no giriniz." });
+        return;
+      }
+      const f = hesaplaSuTekilFatura(aboneNo, yil, donem, user.name);
+      if (!f) {
+        setMesaj({ tip: "err", text: "Fatura hesaplanamadı. Okuma kaydı kontrol edin." });
+        return;
+      }
+      setDataVersiyon((v) => v + 1);
+      setSeciliFatura(f);
+      setMesaj({ tip: "ok", text: `${f.faturaNo} taslak olarak oluşturuldu.` });
+    } else if (tab === "toplu" && section === "toplu-hesap") {
+      const say = topluHesaplaSuFatura(yil, donem, user.name);
+      setDataVersiyon((v) => v + 1);
+      setMesaj({ tip: "ok", text: `${say} abone için toplu hesaplama tamamlandı.` });
     } else if (tab === "toplu" && section === "toplu-kes") {
-      islemMesaj("Toplu fatura kesme işlemi başlatıldı.");
+      const say = topluKesSuFatura(yil, donem, user.name);
+      setDataVersiyon((v) => v + 1);
+      setMesaj({ tip: "ok", text: `${say} fatura kesildi.` });
     } else if (tab === "raporlar") {
       setRaporGoster(true);
       setMesaj({ tip: "info", text: "Rapor oluşturuldu." });
     }
-  }, [tab, section, yil, donem]);
+  }, [tab, section, yil, donem, user.name, tekilAboneParca, okumaAboneParca, okumaForm]);
 
   const handleIptal = useCallback(() => {
     setMesaj(null);
@@ -218,14 +262,25 @@ export function SuFaturaWorkspace() {
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => islemMesaj(`${formatDonem(yil, donem)} tahakkuku oluşturuldu.`)}
+              onClick={() => {
+                olusturSuTahakkuk(yil, donem, user.name);
+                setDataVersiyon((v) => v + 1);
+                setMesaj({ tip: "ok", text: `${formatDonem(yil, donem)} tahakkuku oluşturuldu.` });
+              }}
               className="btn-primary inline-flex h-9"
               disabled={islemYukleniyor}
             >
               {islemYukleniyor ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
               Tahakkuk Oluştur
             </button>
-            <button type="button" onClick={() => islemMesaj("Tahakkuk kontrolü tamamlandı.")} className="btn-secondary inline-flex h-9">
+            <button
+              type="button"
+              onClick={() => {
+                const sonuc = kontrolSuTahakkuk(yil, donem);
+                setMesaj({ tip: sonuc.ok ? "ok" : "err", text: sonuc.mesaj });
+              }}
+              className="btn-secondary inline-flex h-9"
+            >
               <Search className="h-4 w-4" />
               Tahakkuk Kontrol
             </button>
@@ -385,7 +440,12 @@ export function SuFaturaWorkspace() {
                 <>
                   <button
                     type="button"
-                    onClick={() => islemMesaj(`${seciliFatura.faturaNo} yazdırılıyor.`)}
+                    onClick={() => {
+                      if (seciliFatura.durum === "taslak") {
+                        kesSuFatura(seciliFatura.id, user.name);
+                      }
+                      setMesaj({ tip: "ok", text: `${seciliFatura.faturaNo} yazdırılıyor.` });
+                    }}
                     className="btn-secondary inline-flex h-8 text-xs"
                   >
                     <Printer className="h-3.5 w-3.5" />
@@ -394,7 +454,12 @@ export function SuFaturaWorkspace() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => islemMesaj(`${seciliFatura.faturaNo} iptal edildi.`)}
+                    onClick={() => {
+                      iptalSuFatura(seciliFatura.id, user.name);
+                      setDataVersiyon((v) => v + 1);
+                      setSeciliFatura({ ...seciliFatura, durum: "iptal" });
+                      setMesaj({ tip: "ok", text: `${seciliFatura.faturaNo} iptal edildi.` });
+                    }}
                     className="btn-ghost inline-flex h-8 text-xs text-red-600"
                   >
                     <XCircle className="h-3.5 w-3.5" />
@@ -472,7 +537,15 @@ export function SuFaturaWorkspace() {
               <p className="text-lg font-semibold tabular-nums">{formatCurrency(842000)}</p>
             </div>
           </div>
-          <button type="button" onClick={() => islemMesaj("Toplu fatura hesaplama başlatıldı.")} className="btn-primary inline-flex h-9">
+          <button
+            type="button"
+            onClick={() => {
+              const say = topluHesaplaSuFatura(yil, donem, user.name);
+              setDataVersiyon((v) => v + 1);
+              setMesaj({ tip: "ok", text: `${say} abone için toplu hesaplama tamamlandı.` });
+            }}
+            className="btn-primary inline-flex h-9"
+          >
             Toplu Hesaplama Başlat
           </button>
         </div>

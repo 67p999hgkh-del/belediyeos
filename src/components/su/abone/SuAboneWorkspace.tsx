@@ -6,18 +6,19 @@ import {
   AlertCircle,
   CheckCircle2,
   ChevronDown,
-  CreditCard,
   Loader2,
   Printer,
   Search,
 } from "lucide-react";
 import {
   araSuAbone,
+  devirSuAbone,
   formatAboneNo,
   getSuAboneBelgeler,
   getSuAboneByAboneNo,
   getSuAboneFaturalar,
   getSuAboneHareketler,
+  guncelleSuAboneDurum,
   kaydetSuAbone,
   suAbonelikTurleri,
   suTarifeGruplari,
@@ -560,13 +561,19 @@ export function SuAboneWorkspace() {
                             type="button"
                             className="btn-primary inline-flex h-9 text-xs"
                             onClick={() => {
-                              kaydetSuAudit({
-                                kullanici: user.name,
-                                islem: seciliAbone.durum === "aktif" ? "Abone Kapama" : "Abone Açma",
-                                eskiDeger: seciliAbone.durum,
-                                yeniDeger: seciliAbone.durum === "aktif" ? "kapali" : "aktif",
-                                gerekce: kapamaGerekce,
-                                aciklama: seciliAbone.aboneNo,
+                              if (!kapamaGerekce.trim()) {
+                                setMesaj({ tip: "err", text: "Gerekçe zorunludur." });
+                                return;
+                              }
+                              guncelleSuAboneDurum(
+                                seciliAbone.aboneNo,
+                                seciliAbone.durum === "aktif" ? "kapali" : "aktif",
+                                kapamaGerekce,
+                                user.name,
+                              );
+                              setSeciliAbone({
+                                ...seciliAbone,
+                                durum: seciliAbone.durum === "aktif" ? "kapali" : "aktif",
                               });
                               setMesaj({ tip: "ok", text: "Abonelik durumu güncellendi." });
                             }}
@@ -613,13 +620,21 @@ export function SuAboneWorkspace() {
                             type="button"
                             className="btn-primary inline-flex h-9"
                             onClick={() => {
-                              kaydetSuAudit({
-                                kullanici: user.name,
-                                islem: "Abone Devir / Nakil",
-                                eskiDeger: seciliAbone.adSoyad,
-                                yeniDeger: devirForm.yeniAdSoyad,
-                                gerekce: devirForm.gerekce,
-                                aciklama: seciliAbone.aboneNo,
+                              if (!devirForm.yeniAdSoyad.trim() || !devirForm.gerekce.trim()) {
+                                setMesaj({ tip: "err", text: "Yeni ad/soyad ve gerekçe zorunludur." });
+                                return;
+                              }
+                              devirSuAbone(
+                                seciliAbone.aboneNo,
+                                devirForm.yeniAdSoyad,
+                                devirForm.yeniAdres || seciliAbone.adres,
+                                devirForm.gerekce,
+                                user.name,
+                              );
+                              setSeciliAbone({
+                                ...seciliAbone,
+                                adSoyad: devirForm.yeniAdSoyad,
+                                adres: devirForm.yeniAdres || seciliAbone.adres,
                               });
                               setMesaj({ tip: "ok", text: "Devir / nakil işlemi kaydedildi." });
                             }}
@@ -792,9 +807,9 @@ export function SuAboneWorkspace() {
         kaydetDisabled={tab !== "kayit" || kayitDurum === "loading"}
         extra={
           tab === "sorgulama" ? (
-            <button type="button" className="btn-secondary inline-flex h-9 text-xs">
-              <CreditCard className="h-3.5 w-3.5" />
-              Kart Oku
+            <button type="button" onClick={handleSorgula} className="btn-secondary inline-flex h-9 text-xs">
+              <Search className="h-3.5 w-3.5" />
+              F9 — Ara
             </button>
           ) : undefined
         }
