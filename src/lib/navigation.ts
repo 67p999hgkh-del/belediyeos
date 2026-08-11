@@ -138,9 +138,11 @@ export const navigation: NavGroup[] = [
         href: "/personel/memur",
         icon: Users,
         children: [
-          { id: "pm-bilgi", label: "Personel Bilgileri", href: "/personel/memur/bilgi" },
-          { id: "pm-bordro", label: "Bordro", href: "/personel/memur/bordro" },
-          { id: "pm-sgk", label: "SGK İşlemleri", href: "/personel/memur/sgk" },
+          { id: "pm-kart", label: "Memur Kartı", href: "/personel/memur/memur-karti" },
+          { id: "pm-maas", label: "Maaş Hesaplama", href: "/personel/memur/maas-hesaplama" },
+          { id: "pm-liste", label: "Personel Listeleri", href: "/personel/memur/personel-listeleri" },
+          { id: "pm-bordro", label: "Bordro Listesi", href: "/personel/memur/bordro-listeleri" },
+          { id: "pm-mesai", label: "Ek Mesai", href: "/personel/memur/ek-mesai" },
         ],
       },
       {

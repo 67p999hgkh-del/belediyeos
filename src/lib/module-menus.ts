@@ -94,12 +94,12 @@ export const appModules: AppModule[] = [
     label: "Personel (Memur)",
     href: "/personel/memur",
     items: [
-      { id: "bilgi", label: "Personel Bilgileri", href: "/personel/memur/bilgi" },
-      { id: "kadro", label: "Kadro Tanımları", href: "/personel/memur/kadro" },
-      { id: "puantaj", label: "Puantaj", href: "/personel/memur/puantaj" },
-      { id: "bordro", label: "Bordro", href: "/personel/memur/bordro" },
-      { id: "sgk", label: "SGK İşlemleri", href: "/personel/memur/sgk", dividerBefore: true },
-      { id: "rapor", label: "Personel Raporları", href: "/personel/memur/raporlar" },
+      { id: "memur-karti", label: "Memur Kartı", href: "/personel/memur/memur-karti" },
+      { id: "maas-hesaplama", label: "Maaş Hesaplama", href: "/personel/memur/maas-hesaplama" },
+      { id: "personel-listeleri", label: "Personel Listeleri", href: "/personel/memur/personel-listeleri" },
+      { id: "bordro-listeleri", label: "Bordro Listesi", href: "/personel/memur/bordro-listeleri" },
+      { id: "ek-mesai", label: "Ek Mesai", href: "/personel/memur/ek-mesai" },
+      { id: "maas-bilgi", label: "Maaş Tanımları", href: "/personel/memur/maas-bilgi", dividerBefore: true },
     ],
   },
   {
