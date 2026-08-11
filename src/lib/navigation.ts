@@ -183,9 +183,11 @@ export const navigation: NavGroup[] = [
         href: "/muhasebe",
         icon: Wallet,
         children: [
-          { id: "mu-fis", label: "Muhasebe Fişi", href: "/muhasebe/fis" },
+          { id: "mu-kasa", label: "Kasa", href: "/muhasebe/kasa" },
+          { id: "mu-mahsup", label: "Mahsup", href: "/muhasebe/mahsup" },
+          { id: "mu-odeme", label: "Ödeme", href: "/muhasebe/odeme" },
           { id: "mu-butce", label: "Bütçe", href: "/muhasebe/butce" },
-          { id: "mu-mizan", label: "Mizan", href: "/muhasebe/mizan" },
+          { id: "mu-hesap", label: "Hesap Planı", href: "/muhasebe/hesap-plani" },
         ],
       },
     ],

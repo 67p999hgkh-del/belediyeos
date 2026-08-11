@@ -133,10 +133,12 @@ export const appModules: AppModule[] = [
     label: "Muhasebe",
     href: "/muhasebe",
     items: [
-      { id: "fis", label: "Muhasebe Fişi", href: "/muhasebe/fis" },
+      { id: "kasa", label: "Kasa", href: "/muhasebe/kasa" },
+      { id: "mahsup", label: "Mahsup", href: "/muhasebe/mahsup" },
+      { id: "odeme", label: "Ödeme", href: "/muhasebe/odeme" },
       { id: "butce", label: "Bütçe", href: "/muhasebe/butce" },
-      { id: "mizan", label: "Mizan", href: "/muhasebe/mizan" },
-      { id: "rapor", label: "Muhasebe Raporları", href: "/muhasebe/raporlar", dividerBefore: true },
+      { id: "hesap-plani", label: "Hesap Planı", href: "/muhasebe/hesap-plani" },
+      { id: "cek-havale", label: "Çek/Havale", href: "/muhasebe/cek-havale", dividerBefore: true },
     ],
   },
   {
