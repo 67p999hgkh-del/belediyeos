@@ -1,6 +1,9 @@
-import { PlaceholderPage } from "@/components/ui/PlaceholderPage";
-import { getMemurGroup, getMemurSection, getMemurSubMenuItem } from "@/lib/memur-submenus";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
+import {
+  getMemurLeafRedirect,
+  getMemurLegacySectionRedirect,
+  getMemurWorkspace,
+} from "@/lib/memur-workspaces";
 
 interface MemurActionPageProps {
   params: Promise<{ section: string; action: string[] }>;
@@ -8,26 +11,22 @@ interface MemurActionPageProps {
 
 export default async function MemurActionPage({ params }: MemurActionPageProps) {
   const { section: sectionId, action } = await params;
-  const actionId = action[action.length - 1];
-  const section = getMemurSection(sectionId);
-  const subItem = getMemurSubMenuItem(sectionId, actionId);
+  const actionPath = action.join("/");
+  const redirectTo = getMemurLeafRedirect(sectionId, actionPath);
 
-  if (!section) notFound();
+  if (redirectTo) {
+    redirect(redirectTo);
+  }
 
-  const parentGroup = getMemurGroup(section.group);
-  const title = subItem?.label ?? actionId.replace(/-/g, " ");
+  const legacyRedirect = getMemurLegacySectionRedirect(sectionId);
+  if (legacyRedirect) {
+    redirect(legacyRedirect);
+  }
 
-  return (
-    <PlaceholderPage
-      title={`${section.label} — ${title}`}
-      description={subItem?.description}
-      breadcrumbs={[
-        { label: "Kontrol Paneli", href: "/" },
-        { label: "Personel (Memur)", href: "/personel/memur" },
-        ...(parentGroup ? [{ label: parentGroup.label, href: parentGroup.href }] : []),
-        { label: section.label, href: section.href },
-        { label: title },
-      ]}
-    />
-  );
+  const ws = getMemurWorkspace(sectionId);
+  if (ws) {
+    redirect(ws.route);
+  }
+
+  redirect("/personel/memur");
 }
