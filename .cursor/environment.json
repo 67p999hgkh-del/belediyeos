@@ -3,8 +3,8 @@
   "install": "npm install",
   "terminals": [
     {
-      "name": "dev-server",
-      "command": "npm run dev -- -H 0.0.0.0 -p 3000"
+      "name": "web-server",
+      "command": "npm run build && npm start -- -H 0.0.0.0 -p 3000"
     }
   ],
   "ports": [
