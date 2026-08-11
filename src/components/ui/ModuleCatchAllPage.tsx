@@ -1,10 +1,19 @@
 import { PlaceholderPage } from "@/components/ui/PlaceholderPage";
 
 const slugLabels: Record<string, string> = {
+  abone: "Abone",
+  fatura: "Fatura",
+  duzeltme: "Düzeltme",
+  "el-terminali": "El Terminali",
+  "genel-fatura": "Genel Fatura",
+  kredi: "Kredi",
+  "ek-bakiye": "Ek Bakiye",
+  "ceza-indirimi": "Ceza İndirimi",
+  kanalizasyon: "Kanalizasyon",
+  "on-odemeli-sayac": "Ön Ödemeli Sayaçlar",
   sicil: "Sicil Kayıt",
   "sicil-liste": "Sicil Listesi",
   tahakkuk: "Tahakkuk",
-  fatura: "Fatura",
   sayac: "Sayaç Okuma",
   raporlar: "Raporlar",
   beyan: "Beyan",
@@ -49,7 +58,7 @@ export async function ModuleCatchAllPage({
     <PlaceholderPage
       title={`${moduleLabel} — ${title}`}
       breadcrumbs={[
-        { label: "Ana Sayfa", href: "/" },
+        { label: "Kontrol Paneli", href: "/" },
         { label: moduleLabel, href: moduleHref },
         { label: title },
       ]}
