@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { QuickAction } from "@/components/ui/QuickAction";
 import { getSuSection, suSections } from "@/lib/su-submenus";
 import { notFound } from "next/navigation";
 
@@ -14,10 +13,8 @@ export default async function SuSectionPage({ params }: SuSectionPageProps) {
   const section = getSuSection(sectionId);
   if (!section) notFound();
 
-  const Icon = section.icon;
-
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <PageHeader
         title={section.label}
         description={section.description}
@@ -28,57 +25,39 @@ export default async function SuSectionPage({ params }: SuSectionPageProps) {
         ]}
       />
 
-      <div className="card flex items-center gap-4 p-5">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600">
-          <Icon className="h-6 w-6" />
-        </div>
-        <div>
-          <p className="font-semibold text-slate-900">{section.label}</p>
-          <p className="text-sm text-slate-500">
-            {section.subMenus.length} işlem · Alt menüden devam edin
+      {/* Kompakt işlem listesi — kart kalabalığı yok */}
+      <div className="card overflow-hidden">
+        <div className="border-b border-slate-100 px-5 py-3">
+          <p className="text-sm font-medium text-slate-700">
+            {section.subMenus.length} işlem mevcut
           </p>
         </div>
-      </div>
-
-      <div>
-        <h2 className="section-title mb-4">İşlemler</h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {section.subMenus.map((item) => (
-            <QuickAction
-              key={item.id}
-              title={item.label}
-              description={item.description}
-              href={item.href}
-              icon={item.icon}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="card">
-        <div className="border-b border-slate-100 px-5 py-4">
-          <h2 className="font-semibold text-slate-900">Diğer Su Modülleri</h2>
-        </div>
         <ul className="divide-y divide-slate-100">
-          {suSections
-            .filter((s) => s.id !== sectionId)
-            .map((s) => {
-              const SIcon = s.icon;
-              return (
-                <li key={s.id}>
-                  <Link
-                    href={s.href}
-                    className="flex items-center gap-4 px-5 py-3.5 transition hover:bg-slate-50"
-                  >
-                    <SIcon className="h-4 w-4 text-cyan-600" />
-                    <span className="flex-1 text-sm font-medium text-slate-700">{s.label}</span>
-                    <ChevronRight className="h-4 w-4 text-slate-300" />
-                  </Link>
-                </li>
-              );
-            })}
+          {section.subMenus.map((item) => {
+            const Icon = item.icon;
+            return (
+              <li key={item.id}>
+                <Link
+                  href={item.href}
+                  className="flex items-center gap-4 px-5 py-4 transition hover:bg-slate-50"
+                >
+                  <Icon className="h-4 w-4 shrink-0 text-slate-400" />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-slate-900">{item.label}</p>
+                    <p className="text-sm text-slate-500">{item.description}</p>
+                  </div>
+                  <span className="text-slate-300">→</span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </div>
+
+      <Link href="/su" className="btn-ghost inline-flex">
+        <ArrowLeft className="h-4 w-4" />
+        Su Hizmetleri&apos;ne dön
+      </Link>
     </div>
   );
 }
