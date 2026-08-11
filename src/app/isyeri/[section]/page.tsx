@@ -2,8 +2,9 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { PlaceholderPage } from "@/components/ui/PlaceholderPage";
+import { TabbedPlaceholderPage } from "@/components/isyeri/TabbedPlaceholderPage";
 import { getIsyeriItem, isyeriModuleItems } from "@/lib/isyeri-module";
-import { getIsyeriSection } from "@/lib/isyeri-submenus";
+import { getIsyeriGroup, getIsyeriSection, getIsyeriTabGroup } from "@/lib/isyeri-submenus";
 import { notFound } from "next/navigation";
 
 interface IsyeriSectionPageProps {
@@ -14,6 +15,8 @@ export default async function IsyeriSectionPage({ params }: IsyeriSectionPagePro
   const { section: sectionId } = await params;
   const section = getIsyeriSection(sectionId);
   const directItem = getIsyeriItem(sectionId);
+  const tabGroup = getIsyeriTabGroup(sectionId);
+  const parentGroup = directItem ? getIsyeriGroup(directItem.group) : undefined;
 
   if (section) {
     return (
@@ -24,6 +27,9 @@ export default async function IsyeriSectionPage({ params }: IsyeriSectionPagePro
           breadcrumbs={[
             { label: "Kontrol Paneli", href: "/" },
             { label: "İşyeri Vergisi", href: "/isyeri" },
+            ...(parentGroup
+              ? [{ label: parentGroup.label, href: parentGroup.href }]
+              : []),
             { label: section.label },
           ]}
         />
@@ -51,24 +57,31 @@ export default async function IsyeriSectionPage({ params }: IsyeriSectionPagePro
           </ul>
         </div>
 
-        <Link href="/isyeri" className="btn-ghost inline-flex">
+        <Link href={parentGroup?.href ?? "/isyeri"} className="btn-ghost inline-flex">
           <ArrowLeft className="h-4 w-4" />
-          İşyeri Vergisi&apos;ne dön
+          {parentGroup ? `${parentGroup.label}'ne dön` : "İşyeri Vergisi'ne dön"}
         </Link>
       </div>
     );
   }
 
   if (directItem && !directItem.hasSubMenu) {
+    const breadcrumbs = [
+      { label: "Kontrol Paneli", href: "/" },
+      { label: "İşyeri Vergisi", href: "/isyeri" },
+      ...(parentGroup ? [{ label: parentGroup.label, href: parentGroup.href }] : []),
+      { label: directItem.label },
+    ];
+
+    if (tabGroup) {
+      return <TabbedPlaceholderPage activeItemId={sectionId} breadcrumbs={breadcrumbs} />;
+    }
+
     return (
       <PlaceholderPage
         title={directItem.label}
         description={directItem.description}
-        breadcrumbs={[
-          { label: "Kontrol Paneli", href: "/" },
-          { label: "İşyeri Vergisi", href: "/isyeri" },
-          { label: directItem.label },
-        ]}
+        breadcrumbs={breadcrumbs}
       />
     );
   }

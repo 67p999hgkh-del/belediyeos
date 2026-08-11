@@ -13,14 +13,27 @@ import {
   Wallet,
 } from "lucide-react";
 
+export type IsyeriGroupId =
+  | "sicil"
+  | "beyan"
+  | "bakiye"
+  | "ruhsat"
+  | "rapor"
+  | "duzeltme";
+
+export type IsyeriFrequency = "daily" | "periodic" | "admin";
+
 export interface IsyeriModuleItem {
   id: string;
   label: string;
   description: string;
   href: string;
   icon: LucideIcon;
-  group: "sicil" | "beyan" | "bakiye" | "ruhsat" | "rapor" | "duzeltme" | "ceza";
+  group: IsyeriGroupId;
+  frequency: IsyeriFrequency;
   hasSubMenu?: boolean;
+  /** Sekmeli ekran grubu — Giriş/Liste birleşik görünüm */
+  tabGroup?: string;
 }
 
 export const isyeriModuleItems: IsyeriModuleItem[] = [
@@ -31,6 +44,7 @@ export const isyeriModuleItems: IsyeriModuleItem[] = [
     href: "/isyeri/kayit",
     icon: Briefcase,
     group: "sicil",
+    frequency: "daily",
   },
   {
     id: "liste",
@@ -39,6 +53,7 @@ export const isyeriModuleItems: IsyeriModuleItem[] = [
     href: "/isyeri/liste",
     icon: List,
     group: "sicil",
+    frequency: "daily",
   },
   {
     id: "no-degistir",
@@ -47,38 +62,43 @@ export const isyeriModuleItems: IsyeriModuleItem[] = [
     href: "/isyeri/no-degistir",
     icon: Pencil,
     group: "sicil",
+    frequency: "admin",
   },
   {
     id: "beyan-bilgi",
-    label: "Beyan Bilgileri",
-    description: "İşyeri beyan kayıt ve bilgileri",
+    label: "İşyeri Bildirim Bilgileri",
+    description: "İşyeri bildirim kayıt ve bilgileri",
     href: "/isyeri/beyan-bilgi",
     icon: FileText,
     group: "beyan",
+    frequency: "daily",
   },
   {
     id: "beyan-hesapla",
-    label: "Beyan Hesapla",
-    description: "İşyeri vergisi beyanı hesapla",
+    label: "Bildirim Hesapla",
+    description: "İşyeri vergisi bildirimi hesapla",
     href: "/isyeri/beyan-hesapla",
     icon: Calculator,
     group: "beyan",
+    frequency: "periodic",
   },
   {
     id: "beyan-iptal",
-    label: "Beyan Hesaplama İptal",
-    description: "Hesaplanan beyanı iptal et",
+    label: "Bildirim Hesaplama İptali",
+    description: "Hesaplanan bildirimi iptal et",
     href: "/isyeri/beyan-iptal",
     icon: ClipboardList,
     group: "beyan",
+    frequency: "admin",
   },
   {
     id: "beyan-dokum",
-    label: "Beyan Dökümü",
-    description: "Beyan listesi ve döküm raporu",
+    label: "Bildirim Dökümü",
+    description: "Bildirim listesi ve döküm raporu",
     href: "/isyeri/beyan-dokum",
     icon: FileText,
     group: "beyan",
+    frequency: "periodic",
   },
   {
     id: "hesap-bilgi",
@@ -87,6 +107,7 @@ export const isyeriModuleItems: IsyeriModuleItem[] = [
     href: "/isyeri/hesap-bilgi",
     icon: Wallet,
     group: "bakiye",
+    frequency: "daily",
   },
   {
     id: "bakiye-kontrol",
@@ -95,6 +116,7 @@ export const isyeriModuleItems: IsyeriModuleItem[] = [
     href: "/isyeri/bakiye-kontrol",
     icon: Scale,
     group: "bakiye",
+    frequency: "periodic",
   },
   {
     id: "borc-bildirim",
@@ -103,30 +125,34 @@ export const isyeriModuleItems: IsyeriModuleItem[] = [
     href: "/isyeri/borc-bildirim",
     icon: AlertTriangle,
     group: "bakiye",
+    frequency: "periodic",
   },
   {
     id: "borclu-liste",
-    label: "İşyeri Borçlu Listesi",
+    label: "İşyeri Borçlular Listesi",
     description: "Borçlu işyerleri listesi",
     href: "/isyeri/borclu-liste",
     icon: List,
     group: "bakiye",
+    frequency: "daily",
   },
   {
     id: "tarih-borc",
-    label: "Tarihe Göre Borç Listesi",
+    label: "Tarih Bazında İşyeri Borçları Listesi",
     description: "Dönem bazlı borç dökümü",
     href: "/isyeri/tarih-borc",
     icon: List,
     group: "bakiye",
+    frequency: "periodic",
   },
   {
     id: "ruhsat-liste",
-    label: "İşyeri Ruhsat Belgesi Listesi",
-    description: "Ruhsat belgesi kayıtları",
+    label: "İşyeri İzin Belgesi Listesi",
+    description: "İşyeri izin belgesi kayıtları",
     href: "/isyeri/ruhsat-liste",
     icon: Briefcase,
     group: "ruhsat",
+    frequency: "periodic",
   },
   {
     id: "vergi-aski",
@@ -135,54 +161,65 @@ export const isyeriModuleItems: IsyeriModuleItem[] = [
     href: "/isyeri/vergi-aski",
     icon: ClipboardList,
     group: "ruhsat",
+    frequency: "periodic",
   },
   {
     id: "saglik-giris",
-    label: "İşyeri Sağlık Cüzdanı Girişi",
-    description: "Sağlık cüzdanı kaydı oluştur",
+    label: "İşyeri Sağlık Karnesi Giriş",
+    description: "Sağlık karnesi kaydı oluştur",
     href: "/isyeri/saglik-giris",
     icon: HeartPulse,
     group: "ruhsat",
+    frequency: "daily",
+    tabGroup: "saglik-karnesi",
   },
   {
     id: "saglik-liste",
-    label: "İşyeri Sağlık Cüzdanı Listesi",
-    description: "Sağlık cüzdanı kayıtlarını listele",
+    label: "İşyeri Sağlık Karnesi Listesi",
+    description: "Sağlık karnesi kayıtlarını listele",
     href: "/isyeri/saglik-liste",
     icon: HeartPulse,
     group: "ruhsat",
+    frequency: "daily",
+    tabGroup: "saglik-karnesi",
   },
   {
     id: "ihtar-liste",
-    label: "İhtar Listesi",
-    description: "İhtar yazısı gönderilen işyerleri",
+    label: "Uyarı Listesi",
+    description: "Uyarı yazısı gönderilen işyerleri",
     href: "/isyeri/ihtar-liste",
     icon: AlertTriangle,
     group: "rapor",
+    frequency: "periodic",
   },
   {
     id: "vergi-dokum",
-    label: "İşyeri Vergi Dökümü",
+    label: "İşyerleri Vergi Dökümü",
     description: "Vergi tahakkuk ve tahsilat dökümü",
     href: "/isyeri/vergi-dokum",
     icon: FileText,
     group: "rapor",
+    frequency: "periodic",
   },
   {
     id: "hesap-duzeltme",
-    label: "Hesap Düzeltme",
+    label: "İşyeri Hesap Düzeltme",
     description: "İşyeri hesap kaydı düzeltme",
     href: "/isyeri/hesap-duzeltme",
     icon: Pencil,
     group: "duzeltme",
+    frequency: "admin",
+    tabGroup: "hesap-duzeltme",
   },
   {
     id: "duzeltme-liste",
-    label: "Hesap Düzeltme Listesi",
+    label: "İşyeri Hesap Düzeltme Listesi",
     description: "Yapılan düzeltme işlemleri listesi",
     href: "/isyeri/duzeltme-liste",
     icon: List,
     group: "duzeltme",
+    frequency: "admin",
+    tabGroup: "hesap-duzeltme",
   },
   {
     id: "ceza-indirimi",
@@ -190,7 +227,8 @@ export const isyeriModuleItems: IsyeriModuleItem[] = [
     description: "Gecikme cezası indirim işlemleri",
     href: "/isyeri/ceza-indirimi",
     icon: Percent,
-    group: "ceza",
+    group: "duzeltme",
+    frequency: "admin",
     hasSubMenu: true,
   },
 ];
@@ -199,4 +237,15 @@ export const isyeriHubIcon = Briefcase;
 
 export function getIsyeriItem(id: string) {
   return isyeriModuleItems.find((m) => m.id === id);
+}
+
+export function searchIsyeriItems(query: string) {
+  const q = query.trim().toLocaleLowerCase("tr");
+  if (!q) return [];
+
+  return isyeriModuleItems.filter(
+    (item) =>
+      item.label.toLocaleLowerCase("tr").includes(q) ||
+      item.description.toLocaleLowerCase("tr").includes(q),
+  );
 }

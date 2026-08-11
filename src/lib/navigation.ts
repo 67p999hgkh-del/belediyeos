@@ -107,7 +107,7 @@ export const navigation: NavGroup[] = [
         icon: Briefcase,
         children: [
           { id: "i-liste", label: "İşyeri Listesi", href: "/isyeri/liste" },
-          { id: "i-beyan", label: "Beyan Hesapla", href: "/isyeri/beyan-hesapla" },
+          { id: "i-beyan", label: "Bildirim Hesapla", href: "/isyeri/beyan-hesapla" },
           { id: "i-borc", label: "Borçlu Listesi", href: "/isyeri/borclu-liste" },
           { id: "i-kayit", label: "Yeni Kayıt", href: "/isyeri/kayit" },
           { id: "i-ceza", label: "Ceza İndirimi", href: "/isyeri/ceza-indirimi" },

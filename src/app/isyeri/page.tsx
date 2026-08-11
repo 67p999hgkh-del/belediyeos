@@ -1,13 +1,14 @@
 import Link from "next/link";
-import { ArrowRight, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
+import { ModuleCard } from "@/components/ui/ModuleCard";
+import { IsyeriModuleSearch } from "@/components/isyeri/IsyeriModuleSearch";
 import {
-  getIsyeriSection,
   isyeriDailyActions,
+  isyeriTotalItemCount,
   isyeriWorkflowGroups,
 } from "@/lib/isyeri-submenus";
-import { getIsyeriItem } from "@/lib/isyeri-module";
 import { formatCurrency } from "@/lib/utils";
 import { AlertTriangle, Briefcase, Calculator, Scale } from "lucide-react";
 
@@ -16,7 +17,7 @@ export default function IsyeriPage() {
     <div className="space-y-8">
       <PageHeader
         title="İşyeri Vergisi"
-        description="İşyeri sicil, beyan, borç ve ruhsat yönetimi"
+        description="İşyeri sicil, bildirim, borç ve izin yönetimi"
         breadcrumbs={[
           { label: "Kontrol Paneli", href: "/" },
           { label: "İşyeri Vergisi" },
@@ -39,7 +40,7 @@ export default function IsyeriPage() {
           iconColor="bg-orange-50 text-orange-600"
         />
         <StatCard
-          label="Bu Yıl Beyan"
+          label="Bu Yıl Bildirim"
           value="1.654"
           change="%89.8 tamamlandı"
           changeType="neutral"
@@ -87,54 +88,30 @@ export default function IsyeriPage() {
         </div>
       </div>
 
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-sm font-semibold text-slate-900">Modüller</h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Sicil → Beyan → Borç → Ruhsat sırasıyla ilerleyin.
-          </p>
+      <IsyeriModuleSearch />
+
+      <div>
+        <div className="mb-4 flex items-end justify-between gap-4">
+          <div>
+            <h2 className="text-sm font-semibold text-slate-900">İş Alanları</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              {isyeriTotalItemCount} işlem, 6 grupta — Sicil → Bildirim → Borç → İzin sırasıyla
+            </p>
+          </div>
         </div>
 
-        {isyeriWorkflowGroups.map((group) => {
-          const items = group.itemIds.map((id) => getIsyeriItem(id)).filter(Boolean);
-
-          return (
-            <section key={group.id} className="card overflow-hidden">
-              <div className="border-b border-slate-100 bg-slate-50/80 px-5 py-3">
-                <p className="font-semibold text-slate-900">{group.label}</p>
-                <p className="text-xs text-slate-500">{group.description}</p>
-              </div>
-              <ul className="divide-y divide-slate-100">
-                {items.map((item) => {
-                  if (!item) return null;
-                  const Icon = item.icon;
-                  const section = getIsyeriSection(item.id);
-                  const subCount = section?.subMenus.length;
-
-                  return (
-                    <li key={item.id}>
-                      <Link
-                        href={item.href}
-                        className="flex items-center gap-4 px-5 py-4 transition hover:bg-slate-50"
-                      >
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
-                          <Icon className="h-4 w-4" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium text-slate-900">{item.label}</p>
-                          <p className="text-xs text-slate-500">
-                            {subCount ? `${subCount} alt işlem` : item.description}
-                          </p>
-                        </div>
-                        <ArrowRight className="h-4 w-4 shrink-0 text-slate-300" />
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          );
-        })}
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {isyeriWorkflowGroups.map((group) => (
+            <ModuleCard
+              key={group.id}
+              title={group.label}
+              description={`${group.itemIds.length} işlem — ${group.description}`}
+              href={group.href}
+              icon={group.icon}
+              color="orange"
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
