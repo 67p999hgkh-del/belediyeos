@@ -6,7 +6,6 @@ import {
   HeartPulse,
   List,
   Plus,
-  Scale,
   Search,
   Shield,
   Wallet,

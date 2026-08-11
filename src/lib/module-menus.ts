@@ -82,11 +82,11 @@ export const appModules: AppModule[] = [
     label: "İmar",
     href: "/imar",
     items: [
-      { id: "basvuru", label: "İmar Başvuru", href: "/imar/basvuru" },
-      { id: "ruhsat", label: "Yapı Ruhsatı", href: "/imar/ruhsat" },
-      { id: "iskan", label: "İskan", href: "/imar/iskan" },
-      { id: "liste", label: "İmar Listesi", href: "/imar/liste" },
-      { id: "rapor", label: "İmar Raporları", href: "/imar/raporlar", dividerBefore: true },
+      { id: "dosya-kayit", label: "Dosya Kayıt", href: "/imar/dosya-kayit" },
+      { id: "ruhsat-hesaplama", label: "Ruhsat Hesaplama", href: "/imar/ruhsat-hesaplama" },
+      { id: "izin-listesi", label: "İzin Listesi", href: "/imar/izin-listesi" },
+      { id: "dilekce", label: "Dilekçe", href: "/imar/dilekce" },
+      { id: "eski-giris", label: "Eski İzin Girişi", href: "/imar/eski-giris" },
     ],
   },
   {
