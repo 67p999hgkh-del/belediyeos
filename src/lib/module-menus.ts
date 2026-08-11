@@ -107,10 +107,12 @@ export const appModules: AppModule[] = [
     label: "Personel (İşçi)",
     href: "/personel/isci",
     items: [
-      { id: "bilgi", label: "Personel Bilgileri", href: "/personel/isci/bilgi" },
-      { id: "puantaj", label: "Puantaj", href: "/personel/isci/puantaj" },
-      { id: "bordro", label: "Bordro", href: "/personel/isci/bordro" },
-      { id: "rapor", label: "Personel Raporları", href: "/personel/isci/raporlar", dividerBefore: true },
+      { id: "isci-karti", label: "İşçi Kartı", href: "/personel/isci/isci-karti" },
+      { id: "maas-islemleri", label: "Maaş İşlemleri", href: "/personel/isci/grup/hesaplama" },
+      { id: "personel-listeleri", label: "Personel Listeleri", href: "/personel/isci/personel-listeleri" },
+      { id: "bordro-listeleri", label: "Bordro Listesi", href: "/personel/isci/bordro-listeleri" },
+      { id: "kidem-tazminati", label: "Kıdem Tazminatı", href: "/personel/isci/kidem-tazminati" },
+      { id: "ek-mesai", label: "Ek Mesai", href: "/personel/isci/ek-mesai", dividerBefore: true },
     ],
   },
   {

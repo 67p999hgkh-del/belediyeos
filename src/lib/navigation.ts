@@ -151,8 +151,11 @@ export const navigation: NavGroup[] = [
         href: "/personel/isci",
         icon: Users,
         children: [
-          { id: "pi-bilgi", label: "Personel Bilgileri", href: "/personel/isci/bilgi" },
-          { id: "pi-bordro", label: "Bordro", href: "/personel/isci/bordro" },
+          { id: "pi-kart", label: "İşçi Kartı", href: "/personel/isci/isci-karti" },
+          { id: "pi-maas", label: "Maaş İşlemleri", href: "/personel/isci/grup/hesaplama" },
+          { id: "pi-liste", label: "Personel Listeleri", href: "/personel/isci/personel-listeleri" },
+          { id: "pi-bordro", label: "Bordro Listesi", href: "/personel/isci/bordro-listeleri" },
+          { id: "pi-kidem", label: "Kıdem Tazminatı", href: "/personel/isci/kidem-tazminati" },
         ],
       },
       {
