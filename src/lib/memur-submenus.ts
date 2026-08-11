@@ -116,8 +116,8 @@ export const memurWorkflowGroups: MemurWorkflowGroup[] = [
   },
   {
     id: "hesaplama",
-    label: "Maaş Hesaplama",
-    description: "Maaş, ek mesai ve 13. maaş hesaplama",
+    label: "Maaş İşlemleri",
+    description: "Maaş hesaplama, ek mesai ve 13. maaş",
     href: "/personel/memur/grup/hesaplama",
     icon: getMemurItem("maas-hesaplama")!.icon,
     itemIds: ["maas-hesaplama", "ek-mesai", "maas-13"],

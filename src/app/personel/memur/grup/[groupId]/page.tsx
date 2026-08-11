@@ -80,7 +80,7 @@ export default async function MemurGroupPage({ params }: MemurGroupPageProps) {
 
       <Link href="/personel/memur" className="btn-ghost inline-flex">
         <ArrowLeft className="h-4 w-4" />
-        Personel (Memur)&apos;a dön
+        Hub&apos;a dön
       </Link>
     </div>
   );

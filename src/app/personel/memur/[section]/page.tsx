@@ -66,7 +66,7 @@ export default async function MemurSectionPage({ params }: MemurSectionPageProps
 
         <Link href={parentGroup?.href ?? "/personel/memur"} className="btn-ghost inline-flex">
           <ArrowLeft className="h-4 w-4" />
-          {parentGroup ? `${parentGroup.label}'ne dön` : "Personel (Memur)'a dön"}
+          {parentGroup ? `${parentGroup.label} grubuna dön` : "Hub'a dön"}
         </Link>
       </div>
     );
