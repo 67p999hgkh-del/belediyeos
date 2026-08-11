@@ -164,8 +164,11 @@ export const navigation: NavGroup[] = [
         href: "/izin",
         icon: ClipboardList,
         children: [
-          { id: "iz-kayit", label: "İzin Kayıt", href: "/izin/kayit" },
-          { id: "iz-liste", label: "İzin Listesi", href: "/izin/liste" },
+          { id: "iz-kayit", label: "İzin Kaydı", href: "/izin/izin-kaydi" },
+          { id: "iz-liste", label: "İzin Listesi", href: "/izin/izin-listesi" },
+          { id: "iz-durum", label: "İzin Durumu", href: "/izin/izin-durum-liste" },
+          { id: "iz-mazeret", label: "Mazeret İzni", href: "/izin/mazeret-kaydi" },
+          { id: "iz-tanim", label: "İzin Türleri", href: "/izin/grup/tanim" },
         ],
       },
     ],

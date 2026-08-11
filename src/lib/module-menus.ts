@@ -120,9 +120,12 @@ export const appModules: AppModule[] = [
     label: "İzin",
     href: "/izin",
     items: [
-      { id: "kayit", label: "İzin Kayıt", href: "/izin/kayit" },
-      { id: "liste", label: "İzin Listesi", href: "/izin/liste" },
-      { id: "rapor", label: "İzin Raporları", href: "/izin/raporlar", dividerBefore: true },
+      { id: "izin-kaydi", label: "İzin Kaydı", href: "/izin/izin-kaydi" },
+      { id: "izin-listesi", label: "İzin Listesi", href: "/izin/izin-listesi" },
+      { id: "izin-durum", label: "İzin Durumu", href: "/izin/izin-durum-liste" },
+      { id: "mazeret-kaydi", label: "Mazeret İzni", href: "/izin/mazeret-kaydi" },
+      { id: "izin-turu", label: "İzin Türleri", href: "/izin/grup/tanim" },
+      { id: "devreden", label: "Devreden İzin", href: "/izin/devreden-izin", dividerBefore: true },
     ],
   },
   {
