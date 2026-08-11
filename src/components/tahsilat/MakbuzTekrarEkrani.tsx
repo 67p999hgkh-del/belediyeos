@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   AlertCircle,
   CheckCircle2,
@@ -42,7 +42,9 @@ function BilgiSatiri({
 
 export function MakbuzTekrarEkrani() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const makbuzInputRef = useRef<HTMLInputElement>(null);
+  const baslangicNo = searchParams.get("no") ?? "";
 
   const [makbuzNo, setMakbuzNo] = useState("");
   const [aramaDurumu, setAramaDurumu] = useState<MakbuzAramaDurumu>("idle");
@@ -101,8 +103,25 @@ export function MakbuzTekrarEkrani() {
   }, [kayit]);
 
   useEffect(() => {
+    if (baslangicNo) {
+      setMakbuzNo(baslangicNo);
+      void (async () => {
+        setAramaDurumu("loading");
+        await new Promise((r) => setTimeout(r, 300));
+        const sonuc = araMakbuz(baslangicNo);
+        if (!sonuc) {
+          setKayit(null);
+          setAramaDurumu("bulunamadi");
+          return;
+        }
+        setKayit(sonuc);
+        setMakbuzNo(sonuc.makbuzNo);
+        setAramaDurumu("bulundu");
+      })();
+      return;
+    }
     makbuzInputRef.current?.focus();
-  }, []);
+  }, [baslangicNo]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
