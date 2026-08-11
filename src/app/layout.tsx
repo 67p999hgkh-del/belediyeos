@@ -7,8 +7,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin", "latin-ext"] });
 
 export const metadata: Metadata = {
-  title: "Belediye Otomasyon Paneli",
-  description: "Modern belediye yönetim ve otomasyon sistemi",
+  title: "BelediyeOS — Kamu Yönetim Platformu",
+  description: "Belediyeler için kurumsal gelir, personel ve muhasebe yönetim platformu",
 };
 
 export default function RootLayout({

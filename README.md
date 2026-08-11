@@ -1,17 +1,15 @@
-# Belediye Otomasyon Paneli
+# BelediyeOS — Kamu Yönetim Platformu
 
-Modern, web tabanlı belediye yönetim sistemi. BirNet yazılımının yerine geçecek, tüm belediyelerin kullanabileceği çok kiracılı (multi-tenant) panel.
+Kurumsal standartlarda, tüm belediyelerin kullanabileceği web tabanlı yönetim platformu.
 
-## Modüller
+## Özellikler
 
-- **Tahsilat** — Vezne, makbuz, raporlar (ilk geliştirilen modül)
-- **Su** — Abonelik ve faturalandırma
-- **Emlak** — Emlak vergisi
-- **İşyeri** — İşyeri vergisi
-- **İmar** — Ruhsat ve imar
-- **Personel** — Memur ve işçi kadrosu
-- **Muhasebe** — Bütçe ve muhasebe
-- **Zabıta** — Zabıta işlemleri
+- **Kontrol Paneli** — KPI metrikleri, son işlemler, modül bazlı özet
+- **Gelir Yönetimi** — Tahsilat, Su, Emlak, İşyeri, İmar
+- **İnsan Kaynakları** — Memur, İşçi, İzin
+- **Finans** — Muhasebe, bütçe, mizan
+- **Çok Belediye** — Multi-tenant belediye seçici
+- **Mobil Uyumlu** — iPad ve tablet desteği
 
 ## Kurulum
 
@@ -20,14 +18,9 @@ npm install
 npm run dev
 ```
 
-Tarayıcıda [http://localhost:3000](http://localhost:3000) adresini açın.
+## Tasarım Prensipleri
 
-## Teknoloji
-
-- Next.js 15 + React 19
-- TypeScript
-- Tailwind CSS
-
-## Geliştirme
-
-Sayfa sayfa ekran görüntüleri paylaşıldıkça modüller doldurulacaktır.
+- Kurumsal ERP/SaaS arayüz standardı
+- Sol navigasyon, gruplandırılmış modüller
+- Veri odaklı dashboard ve tablo görünümleri
+- Erişilebilir, temiz tipografi

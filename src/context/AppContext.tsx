@@ -6,25 +6,34 @@ import { municipalities, type Municipality } from "@/lib/modules";
 interface AppContextValue {
   municipality: Municipality;
   setMunicipality: (m: Municipality) => void;
-  user: { name: string; role: string };
+  user: { name: string; role: string; email: string };
   period: string;
   setPeriod: (p: string) => void;
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [municipality, setMunicipality] = useState<Municipality>(municipalities[0]);
-  const [period, setPeriod] = useState("2024");
+  const [period, setPeriod] = useState("2026");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <AppContext.Provider
       value={{
         municipality,
         setMunicipality,
-        user: { name: "Ayşe", role: "Admin" },
+        user: {
+          name: "Ayşe Yılmaz",
+          role: "Vezne Sorumlusu",
+          email: "ayse@belediye.gov.tr",
+        },
         period,
         setPeriod,
+        sidebarOpen,
+        setSidebarOpen,
       }}
     >
       {children}

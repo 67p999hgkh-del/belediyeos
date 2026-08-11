@@ -1,3 +1,4 @@
+import { Construction } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 
 interface PlaceholderPageProps {
@@ -10,14 +11,14 @@ export function PlaceholderPage({ title, description, breadcrumbs }: Placeholder
   return (
     <div>
       <PageHeader title={title} description={description} breadcrumbs={breadcrumbs} />
-      <div className="card flex flex-col items-center justify-center p-12 text-center">
-        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-2xl">
-          🚧
+      <div className="card flex flex-col items-center justify-center px-6 py-16 text-center">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
+          <Construction className="h-7 w-7 text-slate-400" />
         </div>
-        <h3 className="text-lg font-semibold text-slate-900">Geliştirme aşamasında</h3>
+        <h3 className="mt-4 text-lg font-semibold text-slate-900">Modül geliştirme aşamasında</h3>
         <p className="mt-2 max-w-md text-sm text-slate-500">
-          Bu sayfa bir sonraki adımda eklenecek. Ekran görüntüsünü paylaşırsanız aynı
-          işlevselliği buraya taşıyabiliriz.
+          Bu ekran bir sonraki sürümde aktif edilecektir. İş akışı ekran görüntüsünü
+          paylaşırsanız kurumsal standartlarda uygulanacaktır.
         </p>
       </div>
     </div>
