@@ -202,8 +202,11 @@ export const navigation: NavGroup[] = [
         href: "/zabita",
         icon: Shield,
         children: [
-          { id: "z-kayit", label: "Kayıt", href: "/zabita/kayit" },
-          { id: "z-liste", label: "Liste", href: "/zabita/liste" },
+          { id: "z-ihbar", label: "İhbarname Kayıt", href: "/zabita/ihbarname-kayit" },
+          { id: "z-liste", label: "İhbarname Listesi", href: "/zabita/ihbarname-liste" },
+          { id: "z-sahis", label: "Şahıs Kayıt", href: "/zabita/sahis-kayit" },
+          { id: "z-mahkeme", label: "Mahkeme Onay", href: "/zabita/mahkeme-onay" },
+          { id: "z-borc", label: "Borç Listesi", href: "/zabita/ihbarname-borc" },
         ],
       },
     ],

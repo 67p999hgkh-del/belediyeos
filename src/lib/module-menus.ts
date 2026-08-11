@@ -146,9 +146,12 @@ export const appModules: AppModule[] = [
     label: "Zabıta",
     href: "/zabita",
     items: [
-      { id: "kayit", label: "Zabıta Kayıt", href: "/zabita/kayit" },
-      { id: "liste", label: "Zabıta Listesi", href: "/zabita/liste" },
-      { id: "rapor", label: "Zabıta Raporları", href: "/zabita/raporlar", dividerBefore: true },
+      { id: "ihbarname-kayit", label: "İhbarname Kayıt", href: "/zabita/ihbarname-kayit" },
+      { id: "ihbarname-liste", label: "İhbarname Listesi", href: "/zabita/ihbarname-liste" },
+      { id: "sahis-kayit", label: "Şahıs Kayıt", href: "/zabita/sahis-kayit" },
+      { id: "mahkeme-onay", label: "Mahkeme Onay", href: "/zabita/mahkeme-onay" },
+      { id: "ihbarname-borc", label: "Borç Listesi", href: "/zabita/ihbarname-borc" },
+      { id: "dava-sonuc", label: "Dava Sonuç Listesi", href: "/zabita/dava-sonuc-liste", dividerBefore: true },
     ],
   },
   {
